@@ -125,3 +125,19 @@
     (intrp a2 '((d d d))) 
   )
 )
+
+(define find-name 
+  '((read name namelist valuelist)
+    (search (if (equal? name (car namelist)) found cont))
+    (cont
+      (:= valuelist (cdr valuelist))
+      (:= namelist (cdr namelist))
+      (goto search)
+    )
+    (found (return (car valuelist)))
+   )
+)
+
+(define test-find-name
+  (intrp find-name '(y (x y z) (1 2 3)))
+)
