@@ -62,20 +62,20 @@
       (:= pp (caar pending))
       (:= vs (cdar pending))
       (:= pending (cdr pending))
-      (if (elem? ppvs marked) loop loop-mark)
+      (if (elem? (pair pp vs) marked) check-pending loop-mark)
     )
 
     (loop-mark
-      (:= marked (cons ppvs marked))
+      (:= marked (cons (pair pp vs) marked))
       (:= bb (lookup program pp))
       (:= code-block '())
       (goto loop-inner)
     )
-;
-;    ; while bb != {}
-;    ;   commnad <- first_command bb
-;    ;   bb      <- rest bb
-;    ;   case command of
+
+    ; while bb != {}
+    ;   commnad <- first_command bb
+    ;   bb      <- rest bb
+    ;   case command of
     (loop-inner
       (:= command (car bb))
       (:= bb (cdr bb))
@@ -93,13 +93,13 @@
     (check-return
       (if (equal? 'return (car command)) return-case error-match-command)
     )
-;          
-;    ; cases
-;          
-;    ; (:= name expr):
-;    ;   ':= -- (car command)
-;    ;   'name -- (cadr command)
-;    ;   'expr -- (caddr command)
+          
+    ; cases
+          
+    ; (:= name expr):
+    ;   ':= -- (car command)
+    ;   'name -- (cadr command)
+    ;   'expr -- (caddr command)
     (assign-case
       (if (lookup-div div (cadr command)) assign-static assign-dynamic)
     )
@@ -111,10 +111,10 @@
       (:= code-block (cons (generate-assign (cadr command) (caddr command) vs) code-block))
       (goto loop-inner-end)
     )
-;
-;    ; (goto label):
-;    ;   `goto -- (car command)
-;    ;   `label -- (cadr command)
+
+    ; (goto label):
+    ;   `goto -- (car command)
+    ;   `label -- (cadr command)
     (goto-case
       (:= bb (lookup program (cadr command)))
       (goto loop-inner-end)
@@ -142,30 +142,33 @@
                  code-block))
       (goto loop-inner-end)
     )
-;
-;    ; (return expr)
-;    ;  `return -- (car command)
-;    ;  `expr   -- (cadr command)
+
+    ; (return expr)
+    ;  `return -- (car command)
+    ;  `expr   -- (cadr command)
     (return-case
       (:= code-block (cons (generate-return (cadr command) vs) code-block))
       (goto loop-inner-end)
     )
-;     
+     
     (loop-inner-end
       (if (null? bb) loop-end loop-inner)
     )
-;
+
     (loop-end 
       (:= residual-code (cons (cons (pair pp vs) code-block) residual-code))
+      (goto check-pending)
+    )
+    (check-pending
       (if (null? pending) exit loop)
     )
-;
-;    ; exit
+
+    ; exit
     (exit
      (return (reverse residual-code))
     )
-;
-;    ; error messages
+
+    ; error messages
     (error-match-command
       (return (error "Wrong command to match: " command))
     )
@@ -187,13 +190,21 @@
 
 (define vs0 (list
   (pair 'name 'z)
-  (pair 'namelist '(a b c z d))
+  (pair 'namelist '(a b z b d))
 ))
 
 (define div (list
   'name
   'namelist
   '(equal? name (car namelist))
+))
+
+(define vs01 (list
+  (pair 'name 'z)
+))
+
+(define div1 (list
+  'name
 ))
 
 ; (define test-fn (run-ms (list find-name div vs0)))
