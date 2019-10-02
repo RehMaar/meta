@@ -17,6 +17,18 @@
 ; zip two lists
 (define (zip xs ys) (map cons xs ys))
 
+; unzip
+(define (unzip xs)
+  (if (null? xs) (pair '() '())
+    (match (car xs)
+      [`(,fst . ,snd)
+        (match (unzip (cdr xs))
+          [`(,fs . ,ss) (pair (cons fst fs) (cons snd ss))]
+        )
+      ]
+    )
+))
+
 ; return #t, if all elements of the 'xs' are true
 ; return #f, if at least one element in the list is false
 (define (all xs) (foldr (lambda (v acc) (and v acc)) #t xs))
@@ -27,7 +39,7 @@
 ; *Dictionary* is a list of key-value pairs.
 ;
 (define (lookup dict key)
-  (let ([value (findf (lambda (key-value) (eq? key (car key-value))) dict)])
+  (let ([value (findf (lambda (key-value) (equal? key (car key-value))) dict)])
     (if value
       (cdr value)
       ;(error "Couldn't find key in the given dict." key)
@@ -41,7 +53,7 @@
     (if value #t #f))
 )
 
-(define (pair fst snd) `(,fst . ,snd))
+(define (pair f s) `(,f . ,s))
 
 (define (unite lst1 lst2) (append lst1 lst2))
 

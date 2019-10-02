@@ -5,6 +5,43 @@
 (load "fc_intrp.rkt")
 (load "tm_intrp.rkt")
 
+(define (readable-labels fc-prog)
+  (define (readable-label label nls)
+    (pair (+ 1 (car nls))
+  	  (cons (pair label `(label ,(+ 1 (car nls)))) (cdr nls))
+    )
+  )
+
+  (let ([fc-labels (map (lambda (bb) (car bb)) fc-prog)])
+		;(map readabl-label fc-labels)
+    (cdr (foldr readable-label (pair 0 '()) fc-labels))
+))
+
+(define (pretty-print fc-prog)
+  (let ([new-labels (readable-labels (cdr fc-prog))])
+		(cons (car fc-prog)
+          (map (lambda (bb) (traverse-bblock new-labels bb))
+               (cdr fc-prog)))
+  )
+  ; add read line
+;  (cons (car fc-prog) result)
+)
+
+; (car bb) -- label
+; (cadr bb) -- first command
+(define (traverse-bblock nlabels bb)
+  (define (tb b)
+    (match (car b)
+      [`(goto ,label) `(goto ,(lookup nlabels label))]
+      [`(if ,expr ,label1 ,label2)
+            `(if ,expr ,(lookup nlabels label1)
+               				 ,(lookup nlabels label2))]
+      [`(return ,expr) `(return ,expr)]
+      [x (cons x (tb (cdr b)))]
+    )
+  )
+  (cons (lookup nlabels (car bb)) (tb (cdr bb)))
+)
 
 (define (lookup-div div x) (elem? x div))
 
@@ -15,7 +52,56 @@
 ; 
 ; Well, if `vs` has the same structure as `ctx` everything
 ; will be okay.
-(define (reduce expr vs) (intrp-expr-subst vs expr))
+; (define (reduce expr vs) ;(intrp-expr-subst vs expr))
+
+(define (reduce expr vs)
+  (let ([pp (reduce-expr vs expr)])
+    (if (car pp)
+      (eval (cdr pp))
+      (cdr pp)
+    )
+))
+
+(define (reduce-expr ctx expr)
+  (cond
+    [(number? expr) (pair #t expr)]
+
+    [(constant? expr) (pair #t expr)]
+
+    [(operator? expr)
+      (reduce-op ctx expr)]
+
+    [else
+      (reduce-var ctx expr)]
+  )
+)
+
+(define (reduce-op ctx op-stmt)
+    (let ([l_eval_expr
+       (map
+          (lambda (x) (reduce-expr ctx x))
+          (cdr op-stmt))
+      ])
+      
+			(if (all (car (unzip l_eval_expr)))
+        (pair #t (cons (car op-stmt) (cdr (unzip l_eval_expr))))
+  			(pair #f (cons (car op-stmt) (map
+                        (lambda (ee)
+                          (if (car ee)
+                            (eval (cdr ee))
+                            (cdr ee)))
+                 			   l_eval_expr)))
+      )
+))
+
+(define (reduce-var ctx var)
+  (pair (key? ctx var) (normalize (lookup ctx var)))
+)
+
+; (trace reduce)
+; (trace reduce-expr)
+; (trace reduce-op)
+; (trace reduce-var)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;; Transition compression mix
@@ -27,7 +113,7 @@
 
 (define (generate-if expr vs goto1 goto2)
  `(if ,(reduce expr vs)
-    ,(pair goto2 vs)
+    ,(pair goto1 vs)
     ,(pair goto2 vs))
 )
 
@@ -35,7 +121,18 @@
    `(return ,(reduce expr vs))
 )
 
-(define (run-m0 args) (intrp fc-mix0 args))
+(define (generate-read read-stmt vs)
+  (cons 'read (filter (lambda (e) (not (key? vs e))) (cdr read-stmt)))
+)
+
+(define (extend instr code) 
+	(if (elem? instr code)
+		code
+    (cons instr code)
+  )
+)
+
+(define (run-mix0 args) (intrp fc-mix0 args))
 ; poly := { (pp0, vs0) }
 ; while unmarked (pp, vs) in poly
 ;   mark (pp, vs)
@@ -62,6 +159,7 @@
       (:= pp (caar pending))
       (:= vs (cdar pending))
       (:= pending (cdr pending))
+      (:= label (pair pp vs))
       (if (elem? (pair pp vs) marked) check-pending loop-mark)
     )
 
@@ -104,11 +202,11 @@
       (if (lookup-div div (cadr command)) assign-static assign-dynamic)
     )
     (assign-static
-      (:= vs (update vs (cadr command) (eval (reduce (caddr command) vs))))
+      (:= vs (update vs (cadr command) (reduce (caddr command) vs)))
       (goto loop-inner-end)
     )
     (assign-dynamic
-      (:= code-block (cons (generate-assign (cadr command) (caddr command) vs) code-block))
+      (:= code-block (extend (generate-assign (cadr command) (caddr command) vs) code-block))
       (goto loop-inner-end)
     )
 
@@ -129,7 +227,7 @@
       (if (lookup-div div (cadr command)) if-static if-dynamic)
     )
     (if-static
-      (:= bb (if (eval (reduce (cadr command) vs))
+      (:= bb (if (reduce (cadr command) vs)
                      (lookup program (caddr command))
                      (lookup program (cadddr command))))
       (goto loop-inner-end)
@@ -137,7 +235,7 @@
     (if-dynamic
       (:= pending (unite (list (pair (caddr command) vs)
                                (pair (cadddr command) vs)) pending))
-      (:= code-block (cons
+      (:= code-block (extend
                  (generate-if (cadr command) vs (caddr command) (cadddr command))
                  code-block))
       (goto loop-inner-end)
@@ -147,7 +245,7 @@
     ;  `return -- (car command)
     ;  `expr   -- (cadr command)
     (return-case
-      (:= code-block (cons (generate-return (cadr command) vs) code-block))
+      (:= code-block (extend (generate-return (cadr command) vs) code-block))
       (goto loop-inner-end)
     )
      
@@ -156,7 +254,7 @@
     )
 
     (loop-end 
-      (:= residual-code (cons (cons (pair pp vs) code-block) residual-code))
+      (:= residual-code (cons (cons label (reverse code-block)) residual-code))
       (goto check-pending)
     )
     (check-pending
@@ -165,7 +263,7 @@
 
     ; exit
     (exit
-     (return (reverse residual-code))
+     (return (cons (generate-read (car program) vs0) (reverse residual-code)))
     )
 
     ; error messages
@@ -188,6 +286,8 @@
    )
 )
 
+;;;;; Tests for find-name
+
 (define vs0 (list
   (pair 'name 'z)
   (pair 'namelist '(a b z b d))
@@ -207,7 +307,7 @@
   'name
 ))
 
-; (define test-fn (run-ms (list find-name div vs0)))
+; (define test-fn (run-mix0 (list find-name div vs0)))
 
 
 ;;;;;; Trace
