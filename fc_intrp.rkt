@@ -10,8 +10,8 @@
 
 ; return block by its label
 (define (find-block label blocks)
-  (let ([result (findf (lambda (x) (eq? (car x) label)) blocks)])
-    (if (eq? result #f)
+  (let ([result (findf (lambda (x) (equal? (car x) label)) blocks)])
+    (if (equal? result #f)
       (error "No such block with a label " label)
       result
     )
@@ -234,19 +234,11 @@
 ;
 (define (intrp-expr-subst ctx expr)
   (cond
-    [(number? expr) (eval expr)]
-
-    [(constant? expr) expr]
-
-    ; a constant is also gives true on (operator?) predicate, so
-    ; we need to order predicated right.
-    [(operator? expr)
-      (intrp-op ctx expr)]
-
-    [else
-      (normalize (intrp-var ctx expr))]
-  )
-)
+    [(number?   expr) (eval expr)                     ]
+    [(constant? expr)  expr                           ]
+    [(operator? expr) (intrp-op ctx expr)             ]
+    [else             (normalize (intrp-var ctx expr))]
+))
 
 (define (normalize e) (cons 'quote (list e)))
 
@@ -277,10 +269,11 @@
 ;
 ;;;; Trace execution.
 ;
-; (trace intrp)
-; (trace intrp-block)
-; (trace intrp-stmts)
-; (trace intrp-jmp)
-; (trace intrp-var)
-; (trace intrp-expr)
-; (trace intrp-op)
+;(trace intrp)
+;(trace intrp-block)
+;(trace intrp-stmts)
+;(trace intrp-jmp)
+;(trace intrp-var)
+;(trace intrp-expr)
+;(trace intrp-expr-subst)
+;(trace intrp-op)

@@ -4,7 +4,7 @@
 
 ; (define (interp-tm tm-prog tm-intput))
 
-(define (fc-intrp tm-prog tm-tape) 10)
+; (define (fc-intrp tm-prog tm-tape) 10)
 
 ;
 ; alph: 0, 1, <space>
@@ -82,7 +82,6 @@
         handle-if-goto
         handle-if-next
       )
-
     )
     (handle-if-goto
 			(:= next-label (cadddr instr))

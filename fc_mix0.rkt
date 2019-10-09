@@ -8,18 +8,18 @@
 (define (readable-labels fc-prog)
   (define (readable-label label nls)
     (pair (+ 1 (car nls))
-  	  (cons (pair label `(label ,(+ 1 (car nls)))) (cdr nls))
+      (cons (pair label `(label ,(+ 1 (car nls)))) (cdr nls))
     )
   )
 
   (let ([fc-labels (map (lambda (bb) (car bb)) fc-prog)])
-		;(map readabl-label fc-labels)
+    ;(map readabl-label fc-labels)
     (cdr (foldr readable-label (pair 0 '()) fc-labels))
 ))
 
 (define (pretty-print fc-prog)
   (let ([new-labels (readable-labels (cdr fc-prog))])
-		(cons (car fc-prog)
+    (cons (car fc-prog)
           (map (lambda (bb) (traverse-bblock new-labels bb))
                (cdr fc-prog)))
   )
@@ -35,7 +35,7 @@
       [`(goto ,label) (list `(goto ,(lookup nlabels label)))]
       [`(if ,expr ,label1 ,label2)
             (list `(if ,expr ,(lookup nlabels label1)
-               				 ,(lookup nlabels label2)))]
+                       ,(lookup nlabels label2)))]
       [`(return ,expr) (list `(return ,expr))]
       [x (cons x (tb (cdr b)))]
     )
@@ -63,8 +63,17 @@
       )
 )))
 
+(define (empty-list? expr)
+  (match expr
+    [`(quote ,x) (null? x)]
+    [else #f]
+  )
+)
+
 (define (reduce-expr ctx expr)
   (cond
+    [(empty-list? expr) (pair #t (normalize expr))]
+
     [(number? expr) (pair #t expr)]
 
     [(constant? expr) (pair #t expr)]
@@ -84,20 +93,23 @@
           (cdr op-stmt))
       ])
       
-			(if (all (car (unzip l_eval_expr)))
+      (if (all (car (unzip l_eval_expr)))
         (pair #t (cons (car op-stmt) (cdr (unzip l_eval_expr))))
-  			(pair #f (cons (car op-stmt) (map
-                        (lambda (ee)
-                          (if (car ee)
-                            (eval (cdr ee))
-                            (cdr ee)))
-                 			   l_eval_expr)))
+        (pair #f (cons (car op-stmt)
+                   (map
+                     (lambda (ee)
+                       (if (car ee)
+                           (eval (cdr ee))
+                           (cdr ee)))
+                     l_eval_expr)))
       )
 ))
 
 (define (reduce-var ctx var)
-  (pair (key? ctx var) (normalize (lookup ctx var)))
-)
+  (if (key? ctx var)
+    (pair #t (normalize (lookup ctx var)))
+    (pair #f var)
+))
 
 ; (trace reduce)
 ; (trace reduce-expr)
@@ -127,8 +139,8 @@
 )
 
 (define (extend instr code) 
-	(if (elem? instr code)
-		code
+  (if (elem? instr code)
+    code
     (cons instr code)
   )
 )
