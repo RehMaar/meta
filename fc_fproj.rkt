@@ -1,4 +1,4 @@
-(load "fc_mix.rkt")
+(load "fc_mix0.rkt")
 (load "tm_intrp.rkt")
 
 (define (fc-mix-fp1 div vs0)
@@ -24,8 +24,22 @@
 (define vs0_tm (list
 	(pair 'prog tm-prog)))
 
-(define fc-mix-fp1-test
-  (fc-mix-fp1 div_tm vs0_tm))
+;(define fc-mix-fp1-test
+;  (fc-mix-fp1 div_tm vs0_tm))
+;
+;(define fc-mix-fp1-test-pp
+;  (pretty-print (fc-mix-fp1 div_tm vs0_tm)))
 
-(define fc-mix-fp1-test-pp
-  (pretty-print (fc-mix-fp1 div_tm vs0_tm)))
+(define p '((read tape-right)
+                      ((label 3)
+                                   (:= tape-left '())
+                                   (if (eq? (tape-head 'tape-right) 0) (label 2) (label 1)))
+                      ((label 2)
+                                   (:= tape-right (tape-write 1 'tape-right))
+                                   (return (cons 'tape-left 'tape-right)))
+                      ((label 1)
+                                   (:= tape-left (cons (tape-head 'tape-right) 'tape-left))
+                                   (:= tape-right (tape-tail 'tape-right))
+                                   (if (eq? (tape-head 'tape-right) 0) (label 2) (label 1))))
+)
+

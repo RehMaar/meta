@@ -32,11 +32,11 @@
 (define (traverse-bblock nlabels bb)
   (define (tb b)
     (match (car b)
-      [`(goto ,label) `(goto ,(lookup nlabels label))]
+      [`(goto ,label) (list `(goto ,(lookup nlabels label)))]
       [`(if ,expr ,label1 ,label2)
-            `(if ,expr ,(lookup nlabels label1)
-               				 ,(lookup nlabels label2))]
-      [`(return ,expr) `(return ,expr)]
+            (list `(if ,expr ,(lookup nlabels label1)
+               				 ,(lookup nlabels label2)))]
+      [`(return ,expr) (list `(return ,expr))]
       [x (cons x (tb (cdr b)))]
     )
   )
@@ -55,12 +55,13 @@
 ; (define (reduce expr vs) ;(intrp-expr-subst vs expr))
 
 (define (reduce expr vs)
-  (let ([pp (reduce-expr vs expr)])
-    (if (car pp)
-      (eval (cdr pp))
-      (cdr pp)
-    )
-))
+  (if (null? expr) expr
+    (let ([pp (reduce-expr vs expr)])
+      (if (car pp)
+        (eval (cdr pp))
+        (cdr pp)
+      )
+)))
 
 (define (reduce-expr ctx expr)
   (cond
