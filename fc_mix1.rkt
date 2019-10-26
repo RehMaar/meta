@@ -57,20 +57,10 @@
 (define (reduce expr vs)
   (if (constant? expr) expr
     (let ([pp (reduce-expr vs expr)])
-    (begin
-      (display ">>>>>>")
-      ;(display expr)
-      ;(display "   ----   ")
-      (display pp)
-      (display "   ----   ")
-      (display (what? expr))
-      (display "\n")
-
       (if (car pp)
         (eval (cdr pp))
         (cdr pp)
       )
-    )
 )))
 
 (define (what? expr)
