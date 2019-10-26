@@ -1,12 +1,11 @@
-(load "fc_mix0.rkt")
-(load "fc_mix1.rkt")
+(load "fc_mix.rkt")
 (load "tm_intrp.rkt")
 
 ;
 ; I Futamura projection
 ;
 (define (fc-mix-fp1 div vs0)
-  (run-mix0 (list tm-intrp div vs0)))
+  (run-mix (list tm-intrp div vs0)))
 
 ;
 ; Test FP1
@@ -37,10 +36,6 @@
 ;
 ; II Futamura projection
 ;
-; comp = [[mix {for} fc {on} fc]]
-;         [ mix {for} fc {in} fc
-;         , div {for} mix {fc, fc}
-;         , vs_0 = [ program -- int
 (define div-mix (list
 	'program
   'div
@@ -53,11 +48,11 @@
 
 
 (define fc-mix-fp2
-  (run-mix1 (list fc-mix1 div-mix vs-mix))
+  (run-mix (list fc-mix div-mix vs-mix))
 )
  
 (define fc-mix-fp2-pp
-  (pretty-print (run-mix1 (list fc-mix1 div-mix vs-mix)))
+  (pretty-print (run-mix (list fc-mix div-mix vs-mix)))
 )
 
 ;
@@ -69,7 +64,4 @@
 
 ;
 ; fc-mix-fp2-test-pp and fc-mix-fp1-test-pp are equal.
-
-
-
 
