@@ -9,9 +9,9 @@
   - Более удобный запуск интерпретатора
     c более понятным отображением результата: `(run-tm-display prog init-tape)`
 
-* fc_mix0.rkt
+* fc_mix.rkt
   Содержит реализацию mix-алгоритма с сжатием переходов.
-  - Запуск: `(run-mix0 args)`, где `args` -- это список
+  - Запуск: `(run-mix args)`, где `args` -- это список
     вида `(program div vs0)`.
   - Pretty-print: `(pretty-print fc-program)`.
 
