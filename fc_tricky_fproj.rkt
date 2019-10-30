@@ -115,6 +115,11 @@
   (pair 'div div-tm)
 ))
 
+(define vs0-mix-tm (list
+  (pair 'program tm-intrp)
+  (pair 'div div-tm)
+))
+
 (define (fc-mix-fp2 div vs)
   (run-mix-new (list fc-mix-new div vs)))
 
@@ -217,8 +222,25 @@
   (pair 'program fc-mix-new)
   (pair 'div     div-mix)))
 
-(define fc3 (fc-mix-fp2 div-mix vs0-mix-mix))
+; Generate some strange SHIT
+(define (fc3) (fc-mix-fp2 div-mix vs0-mix-mix))
 
+; Compilers below both falls with 'contract violation'
+
+; TM compiler
+(define (fc3-tm) (intrp fc3 (list vs0-mix-tm)))
+
+; FC compiler
+(define (fc3-fc) (intrp fc3 (list vs0-mix-fc)))
+
+; Compile tm code
+(define (fc3-tm-example) (intrp (fc3-tm) (list vs0-tm))
+
+; Compile fc code
+(define (fc3-tm-example) (intrp (fc3-fc) (list vs0-fc))
+
+
+; Print with newlines and tabs
 ;(define r (fc-fp2-test-pp))
-(require racket/pretty)
-(pretty-print fc3)
+;(require racket/pretty)
+;(pretty-print fc3)
