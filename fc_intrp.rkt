@@ -35,14 +35,15 @@
 ;
 (define (build-ctx stmt input)
   (match stmt
-    [`(read . ,xs) (zip xs input)]
+    [`(read . ,xs) (init-dict (zip xs input))]
     [ _  (error "Expect `read` command, but got:" stmt)]
   )
 )
 
 ; update context with new pair (key, value)
 (define (update-ctx ctx key value)
-  (cons `(,key . ,value) ctx)
+  (update ctx key value)
+  ;(cons `(,key . ,value) ctx)
 )
 
 
@@ -73,7 +74,8 @@
 
 ; By definition, a context is a list of pairs.
 (define (ctx? ctx)
-  (and (list? ctx) (andmap pair? ctx))
+  #t
+  ;(and (list? ctx) (andmap pair? ctx))
 )
 
 ;
@@ -154,7 +156,7 @@
   )
 )
 
-(define (intrp-ctx prog input) (build-ctx (car prog) input))
+;(define (intrp-ctx prog input) (build-ctx (car prog) input))
 
 
 ; block:
@@ -203,6 +205,7 @@
     )
   )
 )
+
 
 ;
 ; handle jumps
@@ -273,7 +276,7 @@
 ;(trace intrp-block)
 ;(trace intrp-stmts)
 ;(trace intrp-jmp)
-;(trace intrp-var)
 ;(trace intrp-expr)
+;(trace intrp-var)
 ;(trace intrp-expr-subst)
 ;(trace intrp-op)
