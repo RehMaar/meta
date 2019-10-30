@@ -38,19 +38,19 @@
     ;  match command
     (loop
       ; ignore label
-      (if (eq? (car instr) 'goto) handle-goto try-match-left)
+      (if (equal? (car instr) 'goto) handle-goto try-match-left)
     )
     (try-match-left  
-     (if (eq? (car instr) 'left) handle-left try-match-right)
+     (if (equal? (car instr) 'left) handle-left try-match-right)
     )
     (try-match-right
-     (if (eq? (car instr) 'right) handle-right try-match-if)
+     (if (equal? (car instr) 'right) handle-right try-match-if)
     )
     (try-match-if
-     (if (eq? (car instr) 'if) handle-if try-match-write)
+     (if (equal? (car instr) 'if) handle-if try-match-write)
     )
     (try-match-write
-     (if (eq? (car instr) 'write) handle-write error)
+     (if (equal? (car instr) 'write) handle-write error)
     )
 
 
@@ -103,8 +103,6 @@
       (if (not (has-label next-label prog)) exit next))
     (error
       (return 'ERROR))
-    (error2
-      (return 'ERROR2))
     ; we want to see the whole tape for the result
     (exit
       (return (cons tape-left tape-right))
