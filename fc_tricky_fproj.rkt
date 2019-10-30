@@ -1,5 +1,6 @@
 (load "tm_intrp.rkt")
 (load "fc_tricky_mix.rkt")
+(load "fc_intrp_on_fc.rkt")
 
 ;
 ; I Futamura projection
@@ -7,15 +8,13 @@
 
 ; New mixer
 (define (fc-mix-fp1-new div vs0)
-  (run-mix-new-without-debug (list tm-intrp div vs0)))
+  (run-mix-new (list tm-intrp div vs0)))
 
-; The oldest
+; Old mixer
 (define (fc-mix-fp1 div vs0)
   (run-mix (list tm-intrp div vs0)))
 
-;;
-;; Test FP1
-;;
+; Division for TM interpreter.
 (define div-tm (list
   'prog
   'next-label
@@ -38,42 +37,47 @@
 (define vs0-tm (list
   (pair 'prog tm-prog)))
 
+;; test
+(define (fc-mix-fp1-test-new)
+  (pretty-print (fc-mix-fp1-new div-tm vs0-tm)))
+
+(define (fc-mix-fp1-test)
+  (pretty-print (fc-mix-fp1 div-tm vs0-tm)))
+
+
+; test 2
 (define vs0-tm2 (list
   (pair 'prog tm-write)))
 
-;; test
-(define (fc-mix-fp1-test-new)
-  (fc-mix-fp1-new div-tm vs0-tm))
-;
-(define (fc-mix-fp1-test)
-  (fc-mix-fp1 div-tm vs0-tm))
+(define (fc-mix-fp1-test-pp-2-new)
+  (pretty-print (fc-mix-fp1-new div-tm vs0-tm2)))
 
-;; pretty printed test
-(define (fc-mix-fp1-test-pp-new)
-  (pretty-print (fc-mix-fp1-test-new)))
+(define (fc-mix-fp1-test-pp-2)
+  (pretty-print (fc-mix-fp1 div-tm vs0-tm2)))
 
-(define (fc-mix-fp1-test-pp)
-  (pretty-print (fc-mix-fp1-test)))
 
-(define fc-mix-fp1-pp-3-new
-  (pretty-print (fc-mix-fp1-new div-tm (list (list (pair 'prog tm-goto)))))
-)
+; test 3
+(define vs0-tm3 (list
+  (pair 'prog tm-goto)))
 
-(define fc-mix-fp1-pp-3
-  (pretty-print (fc-mix-fp1 div-tm (list (list (pair 'prog tm-goto)))))
-)
+(define (fc-mix-fp1-test-pp-3-new)
+  (pretty-print (fc-mix-fp1-new div-tm vs0-tm3)))
+
+(define (fc-mix-fp1-test-pp-3)
+  (pretty-print (fc-mix-fp1 div-tm vs0-tm3)))
 
 ;
 ;;
 ;; II Futamura projection
 ;;
+;
+
+; Division for a new mixer
 (define div-mix (list
   'div
 
 	'program
   '(cdr program)
-
-;'program-dict
 
   'block-in-pending
   '(cons (car program) (find-block-in-pending div program))
@@ -110,54 +114,111 @@
   (pair 'program tm-intrp)
   (pair 'div div-tm)
 ))
-;
-;
+
 (define (fc-mix-fp2 div vs)
-  (run-mix-new-without-debug (list fc-mix-new-without-debug div vs))
-)
-; 
-(define fc-mix-fp2-pp
-  (pretty-print (fc-mix-fp2 div-mix (init-dict vs0-mix)))
-)
+  (run-mix-new (list fc-mix-new div vs)))
+
+;
+; Generate a compiler.
+;
+(define (fc-mix-fp2-pp)
+  (pretty-print (fc-mix-fp2 div-mix vs0-mix)))
+
 ;
 ;;
 ;; *Check that this is really a compiler.
 ;;
+;
+; Compile several TM programs.
+;
+
+; DEATH
 (define (fc-mix-fp2-test-pp)
   (pretty-print (intrp fc-mix-fp2-pp (list vs0-tm)))
 )
 
-(define fc-mix-fp2-test-pp2
+; Good
+(define (fc-mix-fp2-test-pp2)
   (pretty-print (intrp fc-mix-fp2-pp (list vs0-tm2)))
 )
-(define fc-mix-fp2-test-pp3
+
+; Good
+(define (fc-mix-fp2-test-pp3)
   (pretty-print (intrp fc-mix-fp2-pp (list (list (pair 'prog tm-goto)))))
 )
 
+;
+;
+; Test mixer on Flow Chart interpreter on Flow Chart
+;
+;
+
+(define div-fc (list
+  'prog
+  '(cdadr prog)
+  '(cdar prog)
+
+  'bb
+  '(car bb)
+  '(cdr bb)
+  '(null? bb)
+
+  'stmt
+  '(equal? ':= (car stmt))
+  '(equal? 'goto (car stmt))
+  '(equal? 'if (car stmt))
+  '(equal? 'return (car stmt))
+  '(second stmt)
+  '(third stmt)
+  '(fourth stmt)
+  '(lookup prog (second stmt))
+  '(lookup prog (third stmt))
+  '(lookup prog (fourth stmt))
+))
+
+(define vs0-fc (list
+  (pair 'prog find-name)))
+
+(define vs0-mix-fc (list
+  (pair 'program intrp-on-fc)
+  (pair 'div div-fc)))
 
 ;
-; fc-mix-fp2-test-pp and fc-mix-fp1-test-pp are equal.
-
-;(display (fc-mix-fp2-pp))
-
-(define (fc-mix-fp2  div vs)
-  (run-mix (list fc-mix div vs))
-)
-; 
-;(define fc-mix-fp2-pp-orig
-;  (fc-mix-fp2-orig div-mix (init-dict vs0-mix))
-;)
+; I Futamura projection for intrp-on-fc
 ;
-;;
-;; *Check that this is really a compiler.
-;;
-;(define (fc-mix-fp2-test-pp-orig)
-;  (pretty-print (intrp fc-mix-fp2-pp-orig (list vs0-tm)))
-;)
+(define (fc-mix-fp1-fc-new vs0)
+  (run-mix-new (list intrp-on-fc div-fc vs0)))
+
+(define (fc-fp1-test-pp)
+  (pretty-print (fc-mix-fp1-fc-new vs0-fc)))
+
+(define (fc-fp1-test-pp-run)
+  (intrp fc-test-pp (list (list 'c '(a b c) '(1 2 3)))))
+  
 ;
-;(define fc-mix-fp2-test-pp2-orig
-;  (pretty-print (intrp fc-mix-fp2-pp-orig (list vs0-tm2)))
-;)
-;(define fc-mix-fp2-test-pp3-orig
-;  (pretty-print (intrp fc-mix-fp2-pp-orig (list (list (pair 'prog tm-goto)))))
-;)
+; II Futamura projection for intrp-on-fc
+;
+  
+; Compiler
+(define fc-mix-fp2-fc-new
+  (pretty-print (fc-mix-fp2 div-mix vs0-mix-fc)))
+
+;
+; The same problem as at DEATH example.
+;
+(define (fc-fp2-test-pp)
+  (pretty-print (intrp fc-mix-fp2-fc-new (list vs0-fc))))
+
+;
+; III Futamura projection for intrp-on-fc
+;
+
+(define vs0-mix-mix (list
+  (pair 'program fc-mix-new)
+  (pair 'div     div-mix)))
+
+(define fc3 (fc-mix-fp2 div-mix vs0-mix-mix))
+
+;(define r (fc-fp2-test-pp))
+(require racket/pretty)
+(pretty-print fc3)

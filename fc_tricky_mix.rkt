@@ -47,12 +47,10 @@
   (map (lambda (x) (car x)) (find-block-in-pending div program))
 )
 
-
-(define (run-mix-new args) (intrp fc-mix-new args))
-(define fc-mix-new
+(define (run-mix-new-debug args) (intrp fc-mix-new-debug args))
+(define fc-mix-new-debug
   '((read program div vs0)
     (init
-      (:= read-stmt (car program))
       (:= residual-code (list (generate-read (car program) vs0)))
       (:= program (cdr program))
 
@@ -223,7 +221,6 @@
 
     (exit
      (return (reverse residual-code))
-     ; (return (cons (generate-read read-stmt vs0) (reverse residual-code)))
     )
 
     (error-match-command
@@ -235,16 +232,15 @@
   )
 )
 
-(define (run-mix-new-without-debug args) (intrp fc-mix-new-without-debug args))
-(define fc-mix-new-without-debug
+(define (run-mix-new args) (intrp fc-mix-new args))
+(define fc-mix-new
   '((read program div vs0)
     (init
       (:= pending (list (pair (first-label program) vs0)))
+      (:= marked '())
       (:= residual-code (list (generate-read (car program) vs0)))
       (:= program (cdr program))
-      ;(:= block-in-pending program) ;( (cons (car program) (find-block-in-pending div program)))
       (:= block-in-pending (cons (car program) (find-block-in-pending div program)))
-      (:= marked '())
       (goto loop)
     )
 
@@ -253,7 +249,6 @@
       (:= vs (cdar pending))
       (:= pending (cdr pending))
       (:= label (pair pp vs))
-
       (if (elem? label marked) check-pending loop-mark)
     )
 
@@ -364,7 +359,6 @@
 
     (exit
       (return (reverse residual-code))
-     ;(return (cons (generate-read read-stmt vs0) (reverse residual-code)))
     )
 
     (error-match-command
@@ -396,10 +390,6 @@
     )
 
     (loop-mark
-      ;(:= debug (display "LOOK-MARK: "))
-      ;(:= debug (display-nl pp))
-     
-
       (:= marked (cons (pair pp vs) marked))
       (:= bb (lookup program pp))
       (:= code-block '())

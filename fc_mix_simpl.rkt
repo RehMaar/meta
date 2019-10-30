@@ -43,7 +43,7 @@
         (generate-code-step (cdr bblock)
           (update vs val (eval (reduce expr vs))))
         ; dynamic
-        (second (lambda (x) (cons `(:= ,val ,(reduce expr vs)) x))
+        (snd (lambda (x) (cons `(:= ,val ,(reduce expr vs)) x))
           (generate-code-step (cdr bblock) vs))
       )]
 
@@ -65,7 +65,7 @@
       ]
       [else (error "generate-code-step: unable to generate code for " (car bblock))]
   ))
-  (second (lambda (x) (cons (pair pp vs) x))
+  (snd (lambda (x) (cons (pair pp vs) x))
     (generate-code-step (lookup program pp) vs))
 )
 

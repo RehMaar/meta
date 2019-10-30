@@ -280,3 +280,15 @@
 ;(trace intrp-var)
 ;(trace intrp-expr-subst)
 ;(trace intrp-op)
+
+(define find-name 
+  '((read name namelist valuelist)
+    (search (if (equal? name (car namelist)) found cont))
+    (cont
+      (:= valuelist (cdr valuelist))
+      (:= namelist (cdr namelist))
+      (goto search)
+    )
+    (found (return (car valuelist)))
+   )
+)
