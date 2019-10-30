@@ -241,7 +241,7 @@
       (:= residual-code (list (generate-read (car program) vs0)))
       (:= program (cdr program))
       (:= block-in-pending (cons (car program) (find-block-in-pending div program)))
-      (goto loop)
+      (goto check-pending)
     )
 
     (loop
@@ -316,10 +316,6 @@
     ; So self-app doesn't work, because reduce of '(if (reduce (cadr command) vs) ..)
     ; returns (if (reduce (cadr command) vs) ..) with substitutions.
     (if-static
-      ;(:= bb (if (reduce (cadr command) vs)
-      ;               (lookup program (caddr command))
-      ;               (lookup program (cadddr command))))
-      ;(goto loop-inner-end)
       (if (reduce (cadr command) vs) g1 g2)
     )
     (g1
@@ -497,10 +493,18 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-(define (lookup-div div x) (elem? x div))
+(define (lookup-div div x)
+  (begin
+;  (display "LOOKUP-DIV: ")
+;  (display x)
+;  (display " ")
+;  (display-nl (elem? x div))
+
+  (elem? x div)))
 
 ; program: ((read ..) (label ...) ..)
 (define (first-label program) (caadr program))
+
 
 ; performs constant folding of static parts of an expression
 (define (reduce expr vs)

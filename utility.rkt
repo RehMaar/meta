@@ -80,16 +80,16 @@
       (cdr value)
       ;(error "Couldn't find key in the given dict." key)
       (begin
-       ;(display "WARNING: key wasn't found:")
-       ;(display key)
-       ;(display "\n")
+       (display "WARNING: key wasn't found:")
+       (display key)
+       (display "\n")
       key)
     )
   )
 )
 
 (define (key? dict key)
-  (let ([value (findf (lambda (key-value) (eq? key (car key-value))) dict)])
+  (let ([value (findf (lambda (key-value) (equal? key (car key-value))) dict)])
     (if value #t #f))
 )
 

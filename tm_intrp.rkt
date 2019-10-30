@@ -53,7 +53,6 @@
      (if (equal? (car instr) 'write) handle-write error)
     )
 
-
     ; handlers
     (handle-right
       (:= tape-left (cons (tape-head tape-right) tape-left))
@@ -78,7 +77,7 @@
 
     ; <if <symbol> goto <index>>
     (handle-if    
-      (if (eq? (tape-head tape-right) (cadr instr))
+      (if (equal? (tape-head tape-right) (cadr instr))
         handle-if-goto
         handle-if-next
       )
@@ -110,6 +109,56 @@
    )
 )
 
+(define tm-intrp-official
+ '((read Q Right)
+   (init
+    (:= Qtail Q)
+    (:= Left '())
+    (goto loop))
+   (loop
+    (if (null? Qtail) stop cont))
+   (cont
+    (:= Instruction (car Qtail))
+    (:= Qtail (cdr Qtail))
+    (:= Operator (cadr Instruction))
+    (if (equal? Operator 'right) do-right cont1))
+   (cont1
+     (if (equal? Operator 'left) do-left cont2))
+   (cont2
+     (if (equal? Operator 'write) do-write cont3))
+   (cont3
+     (if (equal? Operator 'goto) do-goto cont4))
+   (cont4
+     (if (equal? Operator 'if) do-if error))
+   (do-right
+     (:= Left (cons (car Right) Left))
+     (:= Right (cdr Right))
+     (goto loop))
+   (do-left
+     (:= Right (cons (car Left) Right))
+     (:= Left (cdr Left))
+     (goto loop))
+   (do-write
+     (:= Symbol (caddr Instruction))
+     (:= Right (cons Symbol (cdr Right)))
+     (goto loop))
+   (do-goto
+     (:= NextLabel (caddr Instruction))
+     (:= Qtail (list-tail Q NextLabel))
+     (goto loop))
+   (do-if
+     (:= Symbol (third Instruction))
+     (:= NextLabel (fifth Instruction))
+     (if (equal? Symbol (car Right)) jump loop))
+   (jump
+    (:= Qtail (list-tail Q NextLabel))
+    (goto loop))
+   (stop (return (cons Left Right)))
+   (error
+     (return "SYNTAX ERROR"))
+  )
+)
+
 (define (tape-head xs)
   (if (null? xs) '() (car xs))
 )
@@ -123,7 +172,7 @@
 )
 
 (define (has-label label prog)
-  (if (findf (lambda (kv) (eq? label (car kv))) prog) #t #f)
+  (if (findf (lambda (kv) (equal? label (car kv))) prog) #t #f)
 )
 
 (define (run-tm prog tape)
@@ -163,6 +212,11 @@
 
 (define tm-write
   '((0 write 0))
+)
+
+(define tm-write-goto
+  '((0 goto 1)
+    (1 write 32))
 )
 
 (define tm-if
