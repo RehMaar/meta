@@ -47,6 +47,144 @@
   (map (lambda (x) (car x)) (find-block-in-pending div program))
 )
 
+
+;
+; The trick
+;
+(define (run-mix-new args) (intrp fc-mix-new args))
+(define fc-mix-new
+  '((read program div vs0)
+    (init
+      (:= pending (list (pair (first-label program) vs0)))
+      (:= marked '())
+      (:= residual-code (list (generate-read (car program) vs0)))
+      (:= program (cdr program))
+      (:= block-in-pending (cons (car program) (find-block-in-pending div program)))
+      (goto check-pending)
+    )
+
+    (loop
+      (:= pp (caar pending))
+      (:= vs (cdar pending))
+      (:= pending (cdr pending))
+      (:= label (pair pp vs))
+      (if (elem? label marked) check-pending loop-mark)
+    )
+
+    (loop-mark
+      (:= marked (cons (pair pp vs) marked))
+      (:= code-block '())
+
+      (goto lookup-pp)
+    )
+
+    ; static: program, lookup-program
+    (lookup-pp
+      (:= lookup-program block-in-pending)
+      (goto lookup-pp-1)
+    )
+
+    ; static: program, lookup-program, pp-cur, bb-cur
+    (lookup-pp-1
+      (:= pp-cur (caar lookup-program))
+      (:= bb (cdar lookup-program))
+      (if (equal? pp pp-cur) loop-inner lookup-pp-2)
+    )
+    (lookup-pp-2
+      (:= lookup-program (cdr lookup-program))
+      (if (null? lookup-program) error lookup-pp-1)
+    )
+
+    (loop-inner
+      (:= command (car bb))
+      (:= bb (cdr bb))
+      (if (equal? ':= (car command)) assign-case check-goto)
+    )
+    (check-goto
+      (if (equal? 'goto (car command)) goto-case check-return)
+    )
+    (check-return
+      (if (equal? 'return (car command)) return-case check-if)
+    )
+    (check-if
+      (if (equal? 'if (car command)) if-case error-match-command)
+    )
+          
+    (assign-case
+      (if (lookup-div div (cadr command)) assign-static assign-dynamic)
+    )
+    (assign-static
+      (:= vs (update vs (cadr command) (reduce (caddr command) vs)))
+      (goto loop-inner-end)
+    )
+    (assign-dynamic
+      (:= code-block (extend (generate-assign (cadr command) (caddr command) vs) code-block))
+      (goto loop-inner-end)
+    )
+
+    (goto-case
+      (:= bb (lookup program (cadr command)))
+      (goto loop-inner-end)
+    )
+
+    (if-case
+      (if (lookup-div div (cadr command)) if-static if-dynamic)
+    )
+
+    ; TODO: BUG, because vs is dynamic, but bb is static
+    ; So self-app doesn't work, because reduce of '(if (reduce (cadr command) vs) ..)
+    ; returns (if (reduce (cadr command) vs) ..) with substitutions.
+    (if-static
+      (if (reduce (cadr command) vs) g1 g2)
+    )
+    (g1
+     (:= bb (lookup program (caddr command)))
+     (goto loop-inner-end)
+    )
+    (g2
+     (:= bb (lookup program (cadddr command)))
+     (goto loop-inner-end)
+    )          
+
+    (if-dynamic
+      (:= pending (unite (list (pair (caddr command) vs)
+                               (pair (cadddr command) vs)) pending))
+      (:= code-block (extend
+                 (generate-if (cadr command) vs (caddr command) (cadddr command))
+                 code-block))
+      (goto loop-inner-end)
+    )
+
+    (return-case
+      (:= code-block (extend (generate-return (cadr command) vs) code-block))
+      (goto loop-inner-end)
+    )
+     
+    (loop-inner-end
+      (if (null? bb) loop-end loop-inner)
+    )
+
+    (loop-end 
+      (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+      (goto check-pending)
+    )
+    (check-pending
+      (if (null? pending) exit loop)
+    )
+
+    (exit
+      (return (reverse residual-code))
+    )
+
+    (error-match-command
+      (return (error "Wrong command to match: " command))
+    )
+    (error
+      (return (error "Some stupid error"))
+    )
+  )
+)
+
 (define (run-mix-new-debug args) (intrp fc-mix-new-debug args))
 (define fc-mix-new-debug
   '((read program div vs0)
@@ -221,140 +359,6 @@
 
     (exit
      (return (reverse residual-code))
-    )
-
-    (error-match-command
-      (return (error "Wrong command to match: " command))
-    )
-    (error
-      (return (error "Some stupid error"))
-    )
-  )
-)
-
-(define (run-mix-new args) (intrp fc-mix-new args))
-(define fc-mix-new
-  '((read program div vs0)
-    (init
-      (:= pending (list (pair (first-label program) vs0)))
-      (:= marked '())
-      (:= residual-code (list (generate-read (car program) vs0)))
-      (:= program (cdr program))
-      (:= block-in-pending (cons (car program) (find-block-in-pending div program)))
-      (goto check-pending)
-    )
-
-    (loop
-      (:= pp (caar pending))
-      (:= vs (cdar pending))
-      (:= pending (cdr pending))
-      (:= label (pair pp vs))
-      (if (elem? label marked) check-pending loop-mark)
-    )
-
-    (loop-mark
-      (:= marked (cons (pair pp vs) marked))
-      (:= code-block '())
-
-      (goto lookup-pp)
-    )
-
-    ; static: program, lookup-program
-    (lookup-pp
-      (:= lookup-program block-in-pending)
-      (goto lookup-pp-1)
-    )
-
-    ; static: program, lookup-program, pp-cur, bb-cur
-    (lookup-pp-1
-      (:= pp-cur (caar lookup-program))
-      (:= bb (cdar lookup-program))
-      (if (equal? pp pp-cur) loop-inner lookup-pp-2)
-    )
-    (lookup-pp-2
-      (:= lookup-program (cdr lookup-program))
-      (if (null? lookup-program) error lookup-pp-1)
-    )
-
-    (loop-inner
-      (:= command (car bb))
-      (:= bb (cdr bb))
-      (if (equal? ':= (car command)) assign-case check-goto)
-    )
-    (check-goto
-      (if (equal? 'goto (car command)) goto-case check-return)
-    )
-    (check-return
-      (if (equal? 'return (car command)) return-case check-if)
-    )
-    (check-if
-      (if (equal? 'if (car command)) if-case error-match-command)
-    )
-          
-    (assign-case
-      (if (lookup-div div (cadr command)) assign-static assign-dynamic)
-    )
-    (assign-static
-      (:= vs (update vs (cadr command) (reduce (caddr command) vs)))
-      (goto loop-inner-end)
-    )
-    (assign-dynamic
-      (:= code-block (extend (generate-assign (cadr command) (caddr command) vs) code-block))
-      (goto loop-inner-end)
-    )
-
-    (goto-case
-      (:= bb (lookup program (cadr command)))
-      (goto loop-inner-end)
-    )
-
-    (if-case
-      (if (lookup-div div (cadr command)) if-static if-dynamic)
-    )
-
-    ; TODO: BUG, because vs is dynamic, but bb is static
-    ; So self-app doesn't work, because reduce of '(if (reduce (cadr command) vs) ..)
-    ; returns (if (reduce (cadr command) vs) ..) with substitutions.
-    (if-static
-      (if (reduce (cadr command) vs) g1 g2)
-    )
-    (g1
-     (:= bb (lookup program (caddr command)))
-     (goto loop-inner-end)
-    )
-    (g2
-     (:= bb (lookup program (cadddr command)))
-     (goto loop-inner-end)
-    )          
-
-    (if-dynamic
-      (:= pending (unite (list (pair (caddr command) vs)
-                               (pair (cadddr command) vs)) pending))
-      (:= code-block (extend
-                 (generate-if (cadr command) vs (caddr command) (cadddr command))
-                 code-block))
-      (goto loop-inner-end)
-    )
-
-    (return-case
-      (:= code-block (extend (generate-return (cadr command) vs) code-block))
-      (goto loop-inner-end)
-    )
-     
-    (loop-inner-end
-      (if (null? bb) loop-end loop-inner)
-    )
-
-    (loop-end 
-      (:= residual-code (cons (cons label (reverse code-block)) residual-code))
-      (goto check-pending)
-    )
-    (check-pending
-      (if (null? pending) exit loop)
-    )
-
-    (exit
-      (return (reverse residual-code))
     )
 
     (error-match-command
