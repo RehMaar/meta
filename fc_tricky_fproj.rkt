@@ -168,10 +168,10 @@
 ;
 ; Generate a compiler.
 ;
-(define (fc-mix-fp2-pp)
+(define (fc-mix-fp2-tm)
   (pretty-print (fc-mix-fp2 div-mix vs0-mix)))
 
-(define (fc-mix-fp2-pp-off)
+(define (fc-mix-fp2-tm-off)
   (pretty-print (fc-mix-fp2 div-mix vs0-mix-tm-official)))
 
 ;
@@ -185,41 +185,41 @@
 ; Good
 
 (define (fc-mix-fp2-test-pp)
-  (pretty-print (intrp (fc-mix-fp2-pp) (list vs0-tm)))
+  (pretty-print (intrp (fc-mix-fp2-tm) (list vs0-tm)))
 )
 
 (define (fc-mix-fp2-test-pp-off)
-  (pretty-print (intrp (fc-mix-fp2-pp-off) (list (list (pair 'Q tm-prog))))))
+  (pretty-print (intrp (fc-mix-fp2-tm-off) (list (list (pair 'Q tm-prog))))))
 
 (define (fc-mix-fp2-test-pp-if)
-  (pretty-print (intrp (fc-mix-fp2-pp) (list (list (pair 'prog tm-if))))))
+  (pretty-print (intrp (fc-mix-fp2-tm) (list (list (pair 'prog tm-if))))))
 
 
 (define (fc-mix-fp2-test-pp-if-off)
-  (pretty-print (intrp (fc-mix-fp2-pp-off) (list (list (pair 'Q tm-if))))))
+  (pretty-print (intrp (fc-mix-fp2-tm-off) (list (list (pair 'Q tm-if))))))
 
 (define (fc-mix-fp2-test-pp-wg)
-  (pretty-print (intrp (fc-mix-fp2-pp) (list (list (pair 'prog tm-write-goto))))))
+  (pretty-print (intrp (fc-mix-fp2-tm) (list (list (pair 'prog tm-write-goto))))))
 
 (define (fc-mix-fp2-test-pp-wg-off)
-  (pretty-print (intrp (fc-mix-fp2-pp-off) (list (list (pair 'Q tm-write-goto))))))
+  (pretty-print (intrp (fc-mix-fp2-tm-off) (list (list (pair 'Q tm-write-goto))))))
 
 ; Good
 (define (fc-mix-fp2-test-pp2)
-  (pretty-print (intrp (fc-mix-fp2-pp) (list vs0-tm2)))
+  (pretty-print (intrp (fc-mix-fp2-tm) (list vs0-tm2)))
 )
 
 (define (fc-mix-fp2-test-pp2-off)
-  (pretty-print (intrp (fc-mix-fp2-pp-off) (list (list (pair 'Q tm-write)))))
+  (pretty-print (intrp (fc-mix-fp2-tm-off) (list (list (pair 'Q tm-write)))))
 )
 
 ; Good
 (define (fc-mix-fp2-test-pp3)
-  (pretty-print (intrp (fc-mix-fp2-pp) (list (list (pair 'prog tm-goto)))))
+  (pretty-print (intrp (fc-mix-fp2-tm) (list (list (pair 'prog tm-goto)))))
 )
 
 (define (fc-mix-fp2-test-pp3-off)
-  (pretty-print (intrp (fc-mix-fp2-pp-off) (list (list (pair 'Q tm-goto)))))
+  (pretty-print (intrp (fc-mix-fp2-tm-off) (list (list (pair 'Q tm-goto)))))
 )
 
 ;
@@ -262,11 +262,11 @@
 (define (fc-mix-fp1-fc-new vs0)
   (run-mix-new (list intrp-on-fc div-fc vs0)))
 
-(define (fc-fp1-test-pp)
+(define (fc-mix-fp1-fc-new)
   (pretty-print (fc-mix-fp1-fc-new vs0-fc)))
 
 (define (fc-fp1-test-pp-run)
-  (intrp (fc-fp1-test-pp) (list (list 'c '(a b c) '(1 2 3)))))
+  (intrp (fc-mix-fp1-fc-new) (list (list 'c '(a b c) '(1 2 3)))))
   
 ;
 ; II Futamura projection for intrp-on-fc
@@ -276,9 +276,6 @@
 (define (fc-mix-fp2-fc-new)
   (pretty-print (fc-mix-fp2 div-mix vs0-mix-fc)))
 
-;
-; The same problem as at DEATH example.
-;
 (define (fc-fp2-test-pp)
   (pretty-print (intrp (fc-mix-fp2-fc-new) (list vs0-fc))))
 
@@ -329,7 +326,7 @@
 
 ; Print with newlines and tabs
 
-;(define f (fc-mix-fp2-pp))
+;(define f (fc-mix-fp2-tm))
 ;(define f (fc-mix-fp2-fc-new))
 ;(define f (pretty-print (fc3)))
 ;(define f (pretty-print (fc3-tm)))
