@@ -60,7 +60,7 @@
       (:= residual-code (list (generate-read (car program) vs0)))
       (:= program (cdr program))
       (:= block-in-pending (cons (car program) (find-block-in-pending div program)))
-      (goto check-pending)
+      (goto loop)
     )
 
     (loop
@@ -74,7 +74,6 @@
     (loop-mark
       (:= marked (cons (pair pp vs) marked))
       (:= code-block '())
-
       (goto lookup-pp)
     )
 
@@ -498,13 +497,7 @@
 
 
 (define (lookup-div div x)
-  (begin
-;  (display "LOOKUP-DIV: ")
-;  (display x)
-;  (display " ")
-;  (display-nl (elem? x div))
-
-  (elem? x div)))
+  (elem? x div))
 
 ; program: ((read ..) (label ...) ..)
 (define (first-label program) (caadr program))

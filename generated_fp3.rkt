@@ -1,0 +1,1442 @@
+(define fc3r '((read vs0)
+  ((label 257)
+   (:= pending (list (pair 'init vs0)))
+   (:= marked '())
+   (:= residual-code (list (generate-read '(read program div vs0) vs0)))
+   (:= pp (caar pending))
+   (:= vs (cdar pending))
+   (:= pending (cdr pending))
+   (:= label (pair pp vs))
+   (if (elem? label marked) (label 256) (label 253)))
+  ((label 256) (if (null? pending) (label 255) (label 254)))
+  ((label 255) (return (reverse residual-code)))
+  ((label 254)
+   (:= pp (caar pending))
+   (:= vs (cdar pending))
+   (:= pending (cdr pending))
+   (:= label (pair pp vs))
+   (if (elem? label marked) (label 256) (label 253)))
+  ((label 253)
+   (:= marked (cons (pair pp vs) marked))
+   (:= code-block '())
+   (if (equal? pp 'init) (label 252) (label 17)))
+  ((label 252)
+   (:=
+    code-block
+    (extend
+     (generate-assign 'pending '(list (pair (first-label program) vs0)) vs)
+     code-block))
+   (:= code-block (extend (generate-assign 'marked ''() vs) code-block))
+   (:=
+    code-block
+    (extend
+     (generate-assign
+      'residual-code
+      '(list (generate-read (car program) vs0))
+      vs)
+     code-block))
+   (:= vs (update vs 'program (reduce '(cdr program) vs)))
+   (:=
+    vs
+    (update
+     vs
+     'block-in-pending
+     (reduce '(cons (car program) (find-block-in-pending div program)) vs)))
+   (:= code-block (extend (generate-assign 'pp '(caar pending) vs) code-block))
+   (:= code-block (extend (generate-assign 'vs '(cdar pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'pending '(cdr pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'label '(pair pp vs) vs) code-block))
+   (:=
+    pending
+    (unite (list (pair 'check-pending vs) (pair 'loop-mark vs)) pending))
+   (:=
+    code-block
+    (extend
+     (generate-if '(elem? label marked) vs 'check-pending 'loop-mark)
+     code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 251) (label 250)))
+  ((label 251) (return (reverse residual-code)))
+  ((label 250)
+   (:= pp (caar pending))
+   (:= vs (cdar pending))
+   (:= pending (cdr pending))
+   (:= label (pair pp vs))
+   (if (elem? label marked) (label 249) (label 248)))
+  ((label 249) (if (null? pending) (label 251) (label 250)))
+  ((label 248)
+   (:= marked (cons (pair pp vs) marked))
+   (:= code-block '())
+   (if (equal? pp 'init) (label 247) (label 246)))
+  ((label 247)
+   (:=
+    code-block
+    (extend
+     (generate-assign 'pending '(list (pair (first-label program) vs0)) vs)
+     code-block))
+   (:= code-block (extend (generate-assign 'marked ''() vs) code-block))
+   (:=
+    code-block
+    (extend
+     (generate-assign
+      'residual-code
+      '(list (generate-read (car program) vs0))
+      vs)
+     code-block))
+   (:= vs (update vs 'program (reduce '(cdr program) vs)))
+   (:=
+    vs
+    (update
+     vs
+     'block-in-pending
+     (reduce '(cons (car program) (find-block-in-pending div program)) vs)))
+   (:= code-block (extend (generate-assign 'pp '(caar pending) vs) code-block))
+   (:= code-block (extend (generate-assign 'vs '(cdar pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'pending '(cdr pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'label '(pair pp vs) vs) code-block))
+   (:=
+    pending
+    (unite (list (pair 'check-pending vs) (pair 'loop-mark vs)) pending))
+   (:=
+    code-block
+    (extend
+     (generate-if '(elem? label marked) vs 'check-pending 'loop-mark)
+     code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 251) (label 250)))
+  ((label 246) (if (equal? pp 'check-pending) (label 245) (label 32)))
+  ((label 245)
+   (:= pending (unite (list (pair 'exit vs) (pair 'loop vs)) pending))
+   (:=
+    code-block
+    (extend (generate-if '(null? pending) vs 'exit 'loop) code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 244) (label 243)))
+  ((label 244) (return (reverse residual-code)))
+  ((label 243)
+   (:= pp (caar pending))
+   (:= vs (cdar pending))
+   (:= pending (cdr pending))
+   (:= label (pair pp vs))
+   (if (elem? label marked) (label 242) (label 241)))
+  ((label 242) (if (null? pending) (label 244) (label 243)))
+  ((label 241)
+   (:= marked (cons (pair pp vs) marked))
+   (:= code-block '())
+   (if (equal? pp 'init) (label 240) (label 239)))
+  ((label 240)
+   (:=
+    code-block
+    (extend
+     (generate-assign 'pending '(list (pair (first-label program) vs0)) vs)
+     code-block))
+   (:= code-block (extend (generate-assign 'marked ''() vs) code-block))
+   (:=
+    code-block
+    (extend
+     (generate-assign
+      'residual-code
+      '(list (generate-read (car program) vs0))
+      vs)
+     code-block))
+   (:= vs (update vs 'program (reduce '(cdr program) vs)))
+   (:=
+    vs
+    (update
+     vs
+     'block-in-pending
+     (reduce '(cons (car program) (find-block-in-pending div program)) vs)))
+   (:= code-block (extend (generate-assign 'pp '(caar pending) vs) code-block))
+   (:= code-block (extend (generate-assign 'vs '(cdar pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'pending '(cdr pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'label '(pair pp vs) vs) code-block))
+   (:=
+    pending
+    (unite (list (pair 'check-pending vs) (pair 'loop-mark vs)) pending))
+   (:=
+    code-block
+    (extend
+     (generate-if '(elem? label marked) vs 'check-pending 'loop-mark)
+     code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 251) (label 250)))
+  ((label 239) (if (equal? pp 'check-pending) (label 238) (label 237)))
+  ((label 238)
+   (:= pending (unite (list (pair 'exit vs) (pair 'loop vs)) pending))
+   (:=
+    code-block
+    (extend (generate-if '(null? pending) vs 'exit 'loop) code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 244) (label 243)))
+  ((label 237) (if (equal? pp 'loop-mark) (label 236) (label 45)))
+  ((label 236)
+   (:=
+    code-block
+    (extend
+     (generate-assign 'marked '(cons (pair pp vs) marked) vs)
+     code-block))
+   (:= code-block (extend (generate-assign 'code-block ''() vs) code-block))
+   (:= vs (update vs 'lookup-program (reduce 'block-in-pending vs)))
+   (:= vs (update vs 'pp-cur (reduce '(caar lookup-program) vs)))
+   (:= vs (update vs 'bb (reduce '(cdar lookup-program) vs)))
+   (:=
+    pending
+    (unite (list (pair 'loop-inner vs) (pair 'lookup-pp-2 vs)) pending))
+   (:=
+    code-block
+    (extend
+     (generate-if '(equal? pp pp-cur) vs 'loop-inner 'lookup-pp-2)
+     code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 235) (label 234)))
+  ((label 235) (return (reverse residual-code)))
+  ((label 234)
+   (:= pp (caar pending))
+   (:= vs (cdar pending))
+   (:= pending (cdr pending))
+   (:= label (pair pp vs))
+   (if (elem? label marked) (label 233) (label 232)))
+  ((label 233) (if (null? pending) (label 235) (label 234)))
+  ((label 232)
+   (:= marked (cons (pair pp vs) marked))
+   (:= code-block '())
+   (if (equal? pp 'init) (label 231) (label 230)))
+  ((label 231)
+   (:=
+    code-block
+    (extend
+     (generate-assign 'pending '(list (pair (first-label program) vs0)) vs)
+     code-block))
+   (:= code-block (extend (generate-assign 'marked ''() vs) code-block))
+   (:=
+    code-block
+    (extend
+     (generate-assign
+      'residual-code
+      '(list (generate-read (car program) vs0))
+      vs)
+     code-block))
+   (:= vs (update vs 'program (reduce '(cdr program) vs)))
+   (:=
+    vs
+    (update
+     vs
+     'block-in-pending
+     (reduce '(cons (car program) (find-block-in-pending div program)) vs)))
+   (:= code-block (extend (generate-assign 'pp '(caar pending) vs) code-block))
+   (:= code-block (extend (generate-assign 'vs '(cdar pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'pending '(cdr pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'label '(pair pp vs) vs) code-block))
+   (:=
+    pending
+    (unite (list (pair 'check-pending vs) (pair 'loop-mark vs)) pending))
+   (:=
+    code-block
+    (extend
+     (generate-if '(elem? label marked) vs 'check-pending 'loop-mark)
+     code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 251) (label 250)))
+  ((label 230) (if (equal? pp 'check-pending) (label 229) (label 228)))
+  ((label 229)
+   (:= pending (unite (list (pair 'exit vs) (pair 'loop vs)) pending))
+   (:=
+    code-block
+    (extend (generate-if '(null? pending) vs 'exit 'loop) code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 244) (label 243)))
+  ((label 228) (if (equal? pp 'loop-mark) (label 227) (label 226)))
+  ((label 227)
+   (:=
+    code-block
+    (extend
+     (generate-assign 'marked '(cons (pair pp vs) marked) vs)
+     code-block))
+   (:= code-block (extend (generate-assign 'code-block ''() vs) code-block))
+   (:= vs (update vs 'lookup-program (reduce 'block-in-pending vs)))
+   (:= vs (update vs 'pp-cur (reduce '(caar lookup-program) vs)))
+   (:= vs (update vs 'bb (reduce '(cdar lookup-program) vs)))
+   (:=
+    pending
+    (unite (list (pair 'loop-inner vs) (pair 'lookup-pp-2 vs)) pending))
+   (:=
+    code-block
+    (extend
+     (generate-if '(equal? pp pp-cur) vs 'loop-inner 'lookup-pp-2)
+     code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 235) (label 234)))
+  ((label 226) (if (equal? pp 'loop-inner) (label 225) (label 56)))
+  ((label 225)
+   (:= vs (update vs 'command (reduce '(car bb) vs)))
+   (:= vs (update vs 'bb (reduce '(cdr bb) vs)))
+   (if (reduce '(equal? ':= (car command)) vs) (label 224) (label 216)))
+  ((label 224)
+   (if (reduce '(lookup-div div (cadr command)) vs) (label 223) (label 57)))
+  ((label 223)
+   (:=
+    code-block
+    (extend
+     (generate-assign
+      'vs
+      '(update vs (cadr command) (reduce (caddr command) vs))
+      vs)
+     code-block))
+   (if (reduce '(null? bb) vs) (label 222) (label 217)))
+  ((label 222)
+   (:=
+    code-block
+    (extend
+     (generate-assign
+      'residual-code
+      '(cons (cons label (reverse code-block)) residual-code)
+      vs)
+     code-block))
+   (:= pending (unite (list (pair 'exit vs) (pair 'loop vs)) pending))
+   (:=
+    code-block
+    (extend (generate-if '(null? pending) vs 'exit 'loop) code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 221) (label 220)))
+  ((label 221) (return (reverse residual-code)))
+  ((label 220)
+   (:= pp (caar pending))
+   (:= vs (cdar pending))
+   (:= pending (cdr pending))
+   (:= label (pair pp vs))
+   (if (elem? label marked) (label 219) (label 218)))
+  ((label 219) (if (null? pending) (label 221) (label 220)))
+  ((label 218)
+   (:= marked (cons (pair pp vs) marked))
+   (:= code-block '())
+   (if (equal? pp 'init) (label 240) (label 239)))
+  ((label 217)
+   (:= vs (update vs 'command (reduce '(car bb) vs)))
+   (:= vs (update vs 'bb (reduce '(cdr bb) vs)))
+   (if (reduce '(equal? ':= (car command)) vs) (label 224) (label 216)))
+  ((label 216)
+   (if (reduce '(equal? 'goto (car command)) vs) (label 215) (label 214)))
+  ((label 215)
+   (:= vs (update vs 'bb (reduce '(lookup program (cadr command)) vs)))
+   (if (reduce '(null? bb) vs) (label 222) (label 217)))
+  ((label 214)
+   (if (reduce '(equal? 'return (car command)) vs) (label 213) (label 212)))
+  ((label 213)
+   (:=
+    code-block
+    (extend
+     (generate-assign
+      'code-block
+      '(extend (generate-return (cadr command) vs) code-block)
+      vs)
+     code-block))
+   (if (reduce '(null? bb) vs) (label 222) (label 217)))
+  ((label 212)
+   (if (reduce '(equal? 'if (car command)) vs) (label 211) (label 62)))
+  ((label 211)
+   (if (reduce '(lookup-div div (cadr command)) vs) (label 210) (label 63)))
+  ((label 210)
+   (:= pending (unite (list (pair 'g1 vs) (pair 'g2 vs)) pending))
+   (:=
+    code-block
+    (extend (generate-if '(reduce (cadr command) vs) vs 'g1 'g2) code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 209) (label 208)))
+  ((label 209) (return (reverse residual-code)))
+  ((label 208)
+   (:= pp (caar pending))
+   (:= vs (cdar pending))
+   (:= pending (cdr pending))
+   (:= label (pair pp vs))
+   (if (elem? label marked) (label 207) (label 206)))
+  ((label 207) (if (null? pending) (label 209) (label 208)))
+  ((label 206)
+   (:= marked (cons (pair pp vs) marked))
+   (:= code-block '())
+   (if (equal? pp 'init) (label 205) (label 204)))
+  ((label 205)
+   (:=
+    code-block
+    (extend
+     (generate-assign 'pending '(list (pair (first-label program) vs0)) vs)
+     code-block))
+   (:= code-block (extend (generate-assign 'marked ''() vs) code-block))
+   (:=
+    code-block
+    (extend
+     (generate-assign
+      'residual-code
+      '(list (generate-read (car program) vs0))
+      vs)
+     code-block))
+   (:= vs (update vs 'program (reduce '(cdr program) vs)))
+   (:=
+    vs
+    (update
+     vs
+     'block-in-pending
+     (reduce '(cons (car program) (find-block-in-pending div program)) vs)))
+   (:= code-block (extend (generate-assign 'pp '(caar pending) vs) code-block))
+   (:= code-block (extend (generate-assign 'vs '(cdar pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'pending '(cdr pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'label '(pair pp vs) vs) code-block))
+   (:=
+    pending
+    (unite (list (pair 'check-pending vs) (pair 'loop-mark vs)) pending))
+   (:=
+    code-block
+    (extend
+     (generate-if '(elem? label marked) vs 'check-pending 'loop-mark)
+     code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 251) (label 250)))
+  ((label 204) (if (equal? pp 'check-pending) (label 203) (label 202)))
+  ((label 203)
+   (:= pending (unite (list (pair 'exit vs) (pair 'loop vs)) pending))
+   (:=
+    code-block
+    (extend (generate-if '(null? pending) vs 'exit 'loop) code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 244) (label 243)))
+  ((label 202) (if (equal? pp 'loop-mark) (label 201) (label 200)))
+  ((label 201)
+   (:=
+    code-block
+    (extend
+     (generate-assign 'marked '(cons (pair pp vs) marked) vs)
+     code-block))
+   (:= code-block (extend (generate-assign 'code-block ''() vs) code-block))
+   (:= vs (update vs 'lookup-program (reduce 'block-in-pending vs)))
+   (:= vs (update vs 'pp-cur (reduce '(caar lookup-program) vs)))
+   (:= vs (update vs 'bb (reduce '(cdar lookup-program) vs)))
+   (:=
+    pending
+    (unite (list (pair 'loop-inner vs) (pair 'lookup-pp-2 vs)) pending))
+   (:=
+    code-block
+    (extend
+     (generate-if '(equal? pp pp-cur) vs 'loop-inner 'lookup-pp-2)
+     code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 235) (label 234)))
+  ((label 200) (if (equal? pp 'loop-inner) (label 199) (label 198)))
+  ((label 199)
+   (:= vs (update vs 'command (reduce '(car bb) vs)))
+   (:= vs (update vs 'bb (reduce '(cdr bb) vs)))
+   (if (reduce '(equal? ':= (car command)) vs) (label 224) (label 216)))
+  ((label 198) (if (equal? pp 'lookup-pp-2) (label 197) (label 72)))
+  ((label 197)
+   (:= vs (update vs 'lookup-program (reduce '(cdr lookup-program) vs)))
+   (if (reduce '(null? lookup-program) vs) (label 196) (label 182)))
+  ((label 196)
+   (:=
+    code-block
+    (extend (generate-return '(error "Some stupid error") vs) code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 195) (label 194)))
+  ((label 195) (return (reverse residual-code)))
+  ((label 194)
+   (:= pp (caar pending))
+   (:= vs (cdar pending))
+   (:= pending (cdr pending))
+   (:= label (pair pp vs))
+   (if (elem? label marked) (label 193) (label 192)))
+  ((label 193) (if (null? pending) (label 195) (label 194)))
+  ((label 192)
+   (:= marked (cons (pair pp vs) marked))
+   (:= code-block '())
+   (if (equal? pp 'init) (label 191) (label 190)))
+  ((label 191)
+   (:=
+    code-block
+    (extend
+     (generate-assign 'pending '(list (pair (first-label program) vs0)) vs)
+     code-block))
+   (:= code-block (extend (generate-assign 'marked ''() vs) code-block))
+   (:=
+    code-block
+    (extend
+     (generate-assign
+      'residual-code
+      '(list (generate-read (car program) vs0))
+      vs)
+     code-block))
+   (:= vs (update vs 'program (reduce '(cdr program) vs)))
+   (:=
+    vs
+    (update
+     vs
+     'block-in-pending
+     (reduce '(cons (car program) (find-block-in-pending div program)) vs)))
+   (:= code-block (extend (generate-assign 'pp '(caar pending) vs) code-block))
+   (:= code-block (extend (generate-assign 'vs '(cdar pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'pending '(cdr pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'label '(pair pp vs) vs) code-block))
+   (:=
+    pending
+    (unite (list (pair 'check-pending vs) (pair 'loop-mark vs)) pending))
+   (:=
+    code-block
+    (extend
+     (generate-if '(elem? label marked) vs 'check-pending 'loop-mark)
+     code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 251) (label 250)))
+  ((label 190) (if (equal? pp 'check-pending) (label 189) (label 188)))
+  ((label 189)
+   (:= pending (unite (list (pair 'exit vs) (pair 'loop vs)) pending))
+   (:=
+    code-block
+    (extend (generate-if '(null? pending) vs 'exit 'loop) code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 244) (label 243)))
+  ((label 188) (if (equal? pp 'loop-mark) (label 187) (label 186)))
+  ((label 187)
+   (:=
+    code-block
+    (extend
+     (generate-assign 'marked '(cons (pair pp vs) marked) vs)
+     code-block))
+   (:= code-block (extend (generate-assign 'code-block ''() vs) code-block))
+   (:= vs (update vs 'lookup-program (reduce 'block-in-pending vs)))
+   (:= vs (update vs 'pp-cur (reduce '(caar lookup-program) vs)))
+   (:= vs (update vs 'bb (reduce '(cdar lookup-program) vs)))
+   (:=
+    pending
+    (unite (list (pair 'loop-inner vs) (pair 'lookup-pp-2 vs)) pending))
+   (:=
+    code-block
+    (extend
+     (generate-if '(equal? pp pp-cur) vs 'loop-inner 'lookup-pp-2)
+     code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 235) (label 234)))
+  ((label 186) (if (equal? pp 'loop-inner) (label 185) (label 184)))
+  ((label 185)
+   (:= vs (update vs 'command (reduce '(car bb) vs)))
+   (:= vs (update vs 'bb (reduce '(cdr bb) vs)))
+   (if (reduce '(equal? ':= (car command)) vs) (label 224) (label 216)))
+  ((label 184) (if (equal? pp 'lookup-pp-2) (label 183) (label 177)))
+  ((label 183)
+   (:= vs (update vs 'lookup-program (reduce '(cdr lookup-program) vs)))
+   (if (reduce '(null? lookup-program) vs) (label 196) (label 182)))
+  ((label 182)
+   (:= vs (update vs 'pp-cur (reduce '(caar lookup-program) vs)))
+   (:= vs (update vs 'bb (reduce '(cdar lookup-program) vs)))
+   (:=
+    pending
+    (unite (list (pair 'loop-inner vs) (pair 'lookup-pp-2 vs)) pending))
+   (:=
+    code-block
+    (extend
+     (generate-if '(equal? pp pp-cur) vs 'loop-inner 'lookup-pp-2)
+     code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 181) (label 180)))
+  ((label 181) (return (reverse residual-code)))
+  ((label 180)
+   (:= pp (caar pending))
+   (:= vs (cdar pending))
+   (:= pending (cdr pending))
+   (:= label (pair pp vs))
+   (if (elem? label marked) (label 179) (label 178)))
+  ((label 179) (if (null? pending) (label 181) (label 180)))
+  ((label 178)
+   (:= marked (cons (pair pp vs) marked))
+   (:= code-block '())
+   (if (equal? pp 'init) (label 231) (label 230)))
+  ((label 177) (if (equal? pp 'g1) (label 176) (label 79)))
+  ((label 176)
+   (:= vs (update vs 'bb (reduce '(lookup program (caddr command)) vs)))
+   (if (reduce '(null? bb) vs) (label 175) (label 170)))
+  ((label 175)
+   (:=
+    code-block
+    (extend
+     (generate-assign
+      'residual-code
+      '(cons (cons label (reverse code-block)) residual-code)
+      vs)
+     code-block))
+   (:= pending (unite (list (pair 'exit vs) (pair 'loop vs)) pending))
+   (:=
+    code-block
+    (extend (generate-if '(null? pending) vs 'exit 'loop) code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 174) (label 173)))
+  ((label 174) (return (reverse residual-code)))
+  ((label 173)
+   (:= pp (caar pending))
+   (:= vs (cdar pending))
+   (:= pending (cdr pending))
+   (:= label (pair pp vs))
+   (if (elem? label marked) (label 172) (label 171)))
+  ((label 172) (if (null? pending) (label 174) (label 173)))
+  ((label 171)
+   (:= marked (cons (pair pp vs) marked))
+   (:= code-block '())
+   (if (equal? pp 'init) (label 240) (label 239)))
+  ((label 170)
+   (:= vs (update vs 'command (reduce '(car bb) vs)))
+   (:= vs (update vs 'bb (reduce '(cdr bb) vs)))
+   (if (reduce '(equal? ':= (car command)) vs) (label 169) (label 166)))
+  ((label 169)
+   (if (reduce '(lookup-div div (cadr command)) vs) (label 168) (label 167)))
+  ((label 168)
+   (:=
+    code-block
+    (extend
+     (generate-assign
+      'vs
+      '(update vs (cadr command) (reduce (caddr command) vs))
+      vs)
+     code-block))
+   (if (reduce '(null? bb) vs) (label 175) (label 170)))
+  ((label 167)
+   (:=
+    code-block
+    (extend
+     (generate-assign
+      'code-block
+      '(extend (generate-assign (cadr command) (caddr command) vs) code-block)
+      vs)
+     code-block))
+   (if (reduce '(null? bb) vs) (label 175) (label 170)))
+  ((label 166)
+   (if (reduce '(equal? 'goto (car command)) vs) (label 165) (label 164)))
+  ((label 165)
+   (:= vs (update vs 'bb (reduce '(lookup program (cadr command)) vs)))
+   (if (reduce '(null? bb) vs) (label 175) (label 170)))
+  ((label 164)
+   (if (reduce '(equal? 'return (car command)) vs) (label 163) (label 162)))
+  ((label 163)
+   (:=
+    code-block
+    (extend
+     (generate-assign
+      'code-block
+      '(extend (generate-return (cadr command) vs) code-block)
+      vs)
+     code-block))
+   (if (reduce '(null? bb) vs) (label 175) (label 170)))
+  ((label 162)
+   (if (reduce '(equal? 'if (car command)) vs) (label 161) (label 154)))
+  ((label 161)
+   (if (reduce '(lookup-div div (cadr command)) vs) (label 160) (label 155)))
+  ((label 160)
+   (:= pending (unite (list (pair 'g1 vs) (pair 'g2 vs)) pending))
+   (:=
+    code-block
+    (extend (generate-if '(reduce (cadr command) vs) vs 'g1 'g2) code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 159) (label 158)))
+  ((label 159) (return (reverse residual-code)))
+  ((label 158)
+   (:= pp (caar pending))
+   (:= vs (cdar pending))
+   (:= pending (cdr pending))
+   (:= label (pair pp vs))
+   (if (elem? label marked) (label 157) (label 156)))
+  ((label 157) (if (null? pending) (label 159) (label 158)))
+  ((label 156)
+   (:= marked (cons (pair pp vs) marked))
+   (:= code-block '())
+   (if (equal? pp 'init) (label 205) (label 204)))
+  ((label 155)
+   (:=
+    code-block
+    (extend
+     (generate-assign
+      'pending
+      '(unite
+        (list (pair (caddr command) vs) (pair (cadddr command) vs))
+        pending)
+      vs)
+     code-block))
+   (:=
+    code-block
+    (extend
+     (generate-assign
+      'code-block
+      '(extend
+        (generate-if (cadr command) vs (caddr command) (cadddr command))
+        code-block)
+      vs)
+     code-block))
+   (if (reduce '(null? bb) vs) (label 175) (label 170)))
+  ((label 154)
+   (:=
+    code-block
+    (extend
+     (generate-return '(error "Wrong command to match: " command) vs)
+     code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 153) (label 152)))
+  ((label 153) (return (reverse residual-code)))
+  ((label 152)
+   (:= pp (caar pending))
+   (:= vs (cdar pending))
+   (:= pending (cdr pending))
+   (:= label (pair pp vs))
+   (if (elem? label marked) (label 151) (label 150)))
+  ((label 151) (if (null? pending) (label 153) (label 152)))
+  ((label 150)
+   (:= marked (cons (pair pp vs) marked))
+   (:= code-block '())
+   (if (equal? pp 'init) (label 149) (label 148)))
+  ((label 149)
+   (:=
+    code-block
+    (extend
+     (generate-assign 'pending '(list (pair (first-label program) vs0)) vs)
+     code-block))
+   (:= code-block (extend (generate-assign 'marked ''() vs) code-block))
+   (:=
+    code-block
+    (extend
+     (generate-assign
+      'residual-code
+      '(list (generate-read (car program) vs0))
+      vs)
+     code-block))
+   (:= vs (update vs 'program (reduce '(cdr program) vs)))
+   (:=
+    vs
+    (update
+     vs
+     'block-in-pending
+     (reduce '(cons (car program) (find-block-in-pending div program)) vs)))
+   (:= code-block (extend (generate-assign 'pp '(caar pending) vs) code-block))
+   (:= code-block (extend (generate-assign 'vs '(cdar pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'pending '(cdr pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'label '(pair pp vs) vs) code-block))
+   (:=
+    pending
+    (unite (list (pair 'check-pending vs) (pair 'loop-mark vs)) pending))
+   (:=
+    code-block
+    (extend
+     (generate-if '(elem? label marked) vs 'check-pending 'loop-mark)
+     code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 251) (label 250)))
+  ((label 148) (if (equal? pp 'check-pending) (label 147) (label 146)))
+  ((label 147)
+   (:= pending (unite (list (pair 'exit vs) (pair 'loop vs)) pending))
+   (:=
+    code-block
+    (extend (generate-if '(null? pending) vs 'exit 'loop) code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 244) (label 243)))
+  ((label 146) (if (equal? pp 'loop-mark) (label 145) (label 144)))
+  ((label 145)
+   (:=
+    code-block
+    (extend
+     (generate-assign 'marked '(cons (pair pp vs) marked) vs)
+     code-block))
+   (:= code-block (extend (generate-assign 'code-block ''() vs) code-block))
+   (:= vs (update vs 'lookup-program (reduce 'block-in-pending vs)))
+   (:= vs (update vs 'pp-cur (reduce '(caar lookup-program) vs)))
+   (:= vs (update vs 'bb (reduce '(cdar lookup-program) vs)))
+   (:=
+    pending
+    (unite (list (pair 'loop-inner vs) (pair 'lookup-pp-2 vs)) pending))
+   (:=
+    code-block
+    (extend
+     (generate-if '(equal? pp pp-cur) vs 'loop-inner 'lookup-pp-2)
+     code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 235) (label 234)))
+  ((label 144) (if (equal? pp 'loop-inner) (label 143) (label 142)))
+  ((label 143)
+   (:= vs (update vs 'command (reduce '(car bb) vs)))
+   (:= vs (update vs 'bb (reduce '(cdr bb) vs)))
+   (if (reduce '(equal? ':= (car command)) vs) (label 224) (label 216)))
+  ((label 142) (if (equal? pp 'lookup-pp-2) (label 141) (label 140)))
+  ((label 141)
+   (:= vs (update vs 'lookup-program (reduce '(cdr lookup-program) vs)))
+   (if (reduce '(null? lookup-program) vs) (label 196) (label 182)))
+  ((label 140) (if (equal? pp 'g1) (label 139) (label 138)))
+  ((label 139)
+   (:= vs (update vs 'bb (reduce '(lookup program (caddr command)) vs)))
+   (if (reduce '(null? bb) vs) (label 175) (label 170)))
+  ((label 138) (if (equal? pp 'g2) (label 137) (label 110)))
+  ((label 137)
+   (:= vs (update vs 'bb (reduce '(lookup program (cadddr command)) vs)))
+   (if (reduce '(null? bb) vs) (label 136) (label 131)))
+  ((label 136)
+   (:=
+    code-block
+    (extend
+     (generate-assign
+      'residual-code
+      '(cons (cons label (reverse code-block)) residual-code)
+      vs)
+     code-block))
+   (:= pending (unite (list (pair 'exit vs) (pair 'loop vs)) pending))
+   (:=
+    code-block
+    (extend (generate-if '(null? pending) vs 'exit 'loop) code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 135) (label 134)))
+  ((label 135) (return (reverse residual-code)))
+  ((label 134)
+   (:= pp (caar pending))
+   (:= vs (cdar pending))
+   (:= pending (cdr pending))
+   (:= label (pair pp vs))
+   (if (elem? label marked) (label 133) (label 132)))
+  ((label 133) (if (null? pending) (label 135) (label 134)))
+  ((label 132)
+   (:= marked (cons (pair pp vs) marked))
+   (:= code-block '())
+   (if (equal? pp 'init) (label 240) (label 239)))
+  ((label 131)
+   (:= vs (update vs 'command (reduce '(car bb) vs)))
+   (:= vs (update vs 'bb (reduce '(cdr bb) vs)))
+   (if (reduce '(equal? ':= (car command)) vs) (label 130) (label 127)))
+  ((label 130)
+   (if (reduce '(lookup-div div (cadr command)) vs) (label 129) (label 128)))
+  ((label 129)
+   (:=
+    code-block
+    (extend
+     (generate-assign
+      'vs
+      '(update vs (cadr command) (reduce (caddr command) vs))
+      vs)
+     code-block))
+   (if (reduce '(null? bb) vs) (label 136) (label 131)))
+  ((label 128)
+   (:=
+    code-block
+    (extend
+     (generate-assign
+      'code-block
+      '(extend (generate-assign (cadr command) (caddr command) vs) code-block)
+      vs)
+     code-block))
+   (if (reduce '(null? bb) vs) (label 136) (label 131)))
+  ((label 127)
+   (if (reduce '(equal? 'goto (car command)) vs) (label 126) (label 125)))
+  ((label 126)
+   (:= vs (update vs 'bb (reduce '(lookup program (cadr command)) vs)))
+   (if (reduce '(null? bb) vs) (label 136) (label 131)))
+  ((label 125)
+   (if (reduce '(equal? 'return (car command)) vs) (label 124) (label 123)))
+  ((label 124)
+   (:=
+    code-block
+    (extend
+     (generate-assign
+      'code-block
+      '(extend (generate-return (cadr command) vs) code-block)
+      vs)
+     code-block))
+   (if (reduce '(null? bb) vs) (label 136) (label 131)))
+  ((label 123)
+   (if (reduce '(equal? 'if (car command)) vs) (label 122) (label 115)))
+  ((label 122)
+   (if (reduce '(lookup-div div (cadr command)) vs) (label 121) (label 116)))
+  ((label 121)
+   (:= pending (unite (list (pair 'g1 vs) (pair 'g2 vs)) pending))
+   (:=
+    code-block
+    (extend (generate-if '(reduce (cadr command) vs) vs 'g1 'g2) code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 120) (label 119)))
+  ((label 120) (return (reverse residual-code)))
+  ((label 119)
+   (:= pp (caar pending))
+   (:= vs (cdar pending))
+   (:= pending (cdr pending))
+   (:= label (pair pp vs))
+   (if (elem? label marked) (label 118) (label 117)))
+  ((label 118) (if (null? pending) (label 120) (label 119)))
+  ((label 117)
+   (:= marked (cons (pair pp vs) marked))
+   (:= code-block '())
+   (if (equal? pp 'init) (label 205) (label 204)))
+  ((label 116)
+   (:=
+    code-block
+    (extend
+     (generate-assign
+      'pending
+      '(unite
+        (list (pair (caddr command) vs) (pair (cadddr command) vs))
+        pending)
+      vs)
+     code-block))
+   (:=
+    code-block
+    (extend
+     (generate-assign
+      'code-block
+      '(extend
+        (generate-if (cadr command) vs (caddr command) (cadddr command))
+        code-block)
+      vs)
+     code-block))
+   (if (reduce '(null? bb) vs) (label 136) (label 131)))
+  ((label 115)
+   (:=
+    code-block
+    (extend
+     (generate-return '(error "Wrong command to match: " command) vs)
+     code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 114) (label 113)))
+  ((label 114) (return (reverse residual-code)))
+  ((label 113)
+   (:= pp (caar pending))
+   (:= vs (cdar pending))
+   (:= pending (cdr pending))
+   (:= label (pair pp vs))
+   (if (elem? label marked) (label 112) (label 111)))
+  ((label 112) (if (null? pending) (label 114) (label 113)))
+  ((label 111)
+   (:= marked (cons (pair pp vs) marked))
+   (:= code-block '())
+   (if (equal? pp 'init) (label 149) (label 148)))
+  ((label 110) (if (equal? pp 'exit) (label 109) (label 82)))
+  ((label 109)
+   (:=
+    code-block
+    (extend (generate-return '(reverse residual-code) vs) code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 108) (label 107)))
+  ((label 108) (return (reverse residual-code)))
+  ((label 107)
+   (:= pp (caar pending))
+   (:= vs (cdar pending))
+   (:= pending (cdr pending))
+   (:= label (pair pp vs))
+   (if (elem? label marked) (label 106) (label 105)))
+  ((label 106) (if (null? pending) (label 108) (label 107)))
+  ((label 105)
+   (:= marked (cons (pair pp vs) marked))
+   (:= code-block '())
+   (if (equal? pp 'init) (label 104) (label 103)))
+  ((label 104)
+   (:=
+    code-block
+    (extend
+     (generate-assign 'pending '(list (pair (first-label program) vs0)) vs)
+     code-block))
+   (:= code-block (extend (generate-assign 'marked ''() vs) code-block))
+   (:=
+    code-block
+    (extend
+     (generate-assign
+      'residual-code
+      '(list (generate-read (car program) vs0))
+      vs)
+     code-block))
+   (:= vs (update vs 'program (reduce '(cdr program) vs)))
+   (:=
+    vs
+    (update
+     vs
+     'block-in-pending
+     (reduce '(cons (car program) (find-block-in-pending div program)) vs)))
+   (:= code-block (extend (generate-assign 'pp '(caar pending) vs) code-block))
+   (:= code-block (extend (generate-assign 'vs '(cdar pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'pending '(cdr pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'label '(pair pp vs) vs) code-block))
+   (:=
+    pending
+    (unite (list (pair 'check-pending vs) (pair 'loop-mark vs)) pending))
+   (:=
+    code-block
+    (extend
+     (generate-if '(elem? label marked) vs 'check-pending 'loop-mark)
+     code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 251) (label 250)))
+  ((label 103) (if (equal? pp 'check-pending) (label 102) (label 101)))
+  ((label 102)
+   (:= pending (unite (list (pair 'exit vs) (pair 'loop vs)) pending))
+   (:=
+    code-block
+    (extend (generate-if '(null? pending) vs 'exit 'loop) code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 244) (label 243)))
+  ((label 101) (if (equal? pp 'loop-mark) (label 100) (label 99)))
+  ((label 100)
+   (:=
+    code-block
+    (extend
+     (generate-assign 'marked '(cons (pair pp vs) marked) vs)
+     code-block))
+   (:= code-block (extend (generate-assign 'code-block ''() vs) code-block))
+   (:= vs (update vs 'lookup-program (reduce 'block-in-pending vs)))
+   (:= vs (update vs 'pp-cur (reduce '(caar lookup-program) vs)))
+   (:= vs (update vs 'bb (reduce '(cdar lookup-program) vs)))
+   (:=
+    pending
+    (unite (list (pair 'loop-inner vs) (pair 'lookup-pp-2 vs)) pending))
+   (:=
+    code-block
+    (extend
+     (generate-if '(equal? pp pp-cur) vs 'loop-inner 'lookup-pp-2)
+     code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 235) (label 234)))
+  ((label 99) (if (equal? pp 'loop-inner) (label 98) (label 97)))
+  ((label 98)
+   (:= vs (update vs 'command (reduce '(car bb) vs)))
+   (:= vs (update vs 'bb (reduce '(cdr bb) vs)))
+   (if (reduce '(equal? ':= (car command)) vs) (label 224) (label 216)))
+  ((label 97) (if (equal? pp 'lookup-pp-2) (label 96) (label 95)))
+  ((label 96)
+   (:= vs (update vs 'lookup-program (reduce '(cdr lookup-program) vs)))
+   (if (reduce '(null? lookup-program) vs) (label 196) (label 182)))
+  ((label 95) (if (equal? pp 'g1) (label 94) (label 93)))
+  ((label 94)
+   (:= vs (update vs 'bb (reduce '(lookup program (caddr command)) vs)))
+   (if (reduce '(null? bb) vs) (label 175) (label 170)))
+  ((label 93) (if (equal? pp 'g2) (label 92) (label 91)))
+  ((label 92)
+   (:= vs (update vs 'bb (reduce '(lookup program (cadddr command)) vs)))
+   (if (reduce '(null? bb) vs) (label 136) (label 131)))
+  ((label 91) (if (equal? pp 'exit) (label 90) (label 89)))
+  ((label 90)
+   (:=
+    code-block
+    (extend (generate-return '(reverse residual-code) vs) code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 108) (label 107)))
+  ((label 89) (if (equal? pp 'loop) (label 88) (label 83)))
+  ((label 88)
+   (:= code-block (extend (generate-assign 'pp '(caar pending) vs) code-block))
+   (:= code-block (extend (generate-assign 'vs '(cdar pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'pending '(cdr pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'label '(pair pp vs) vs) code-block))
+   (:=
+    pending
+    (unite (list (pair 'check-pending vs) (pair 'loop-mark vs)) pending))
+   (:=
+    code-block
+    (extend
+     (generate-if '(elem? label marked) vs 'check-pending 'loop-mark)
+     code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 87) (label 86)))
+  ((label 87) (return (reverse residual-code)))
+  ((label 86)
+   (:= pp (caar pending))
+   (:= vs (cdar pending))
+   (:= pending (cdr pending))
+   (:= label (pair pp vs))
+   (if (elem? label marked) (label 85) (label 84)))
+  ((label 85) (if (null? pending) (label 87) (label 86)))
+  ((label 84)
+   (:= marked (cons (pair pp vs) marked))
+   (:= code-block '())
+   (if (equal? pp 'init) (label 247) (label 246)))
+  ((label 83) (return (error "Some stupid error")))
+  ((label 82) (if (equal? pp 'loop) (label 81) (label 80)))
+  ((label 81)
+   (:= code-block (extend (generate-assign 'pp '(caar pending) vs) code-block))
+   (:= code-block (extend (generate-assign 'vs '(cdar pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'pending '(cdr pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'label '(pair pp vs) vs) code-block))
+   (:=
+    pending
+    (unite (list (pair 'check-pending vs) (pair 'loop-mark vs)) pending))
+   (:=
+    code-block
+    (extend
+     (generate-if '(elem? label marked) vs 'check-pending 'loop-mark)
+     code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 87) (label 86)))
+  ((label 80) (return (error "Some stupid error")))
+  ((label 79) (if (equal? pp 'g2) (label 78) (label 77)))
+  ((label 78)
+   (:= vs (update vs 'bb (reduce '(lookup program (cadddr command)) vs)))
+   (if (reduce '(null? bb) vs) (label 136) (label 131)))
+  ((label 77) (if (equal? pp 'exit) (label 76) (label 75)))
+  ((label 76)
+   (:=
+    code-block
+    (extend (generate-return '(reverse residual-code) vs) code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 108) (label 107)))
+  ((label 75) (if (equal? pp 'loop) (label 74) (label 73)))
+  ((label 74)
+   (:= code-block (extend (generate-assign 'pp '(caar pending) vs) code-block))
+   (:= code-block (extend (generate-assign 'vs '(cdar pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'pending '(cdr pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'label '(pair pp vs) vs) code-block))
+   (:=
+    pending
+    (unite (list (pair 'check-pending vs) (pair 'loop-mark vs)) pending))
+   (:=
+    code-block
+    (extend
+     (generate-if '(elem? label marked) vs 'check-pending 'loop-mark)
+     code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 87) (label 86)))
+  ((label 73) (return (error "Some stupid error")))
+  ((label 72) (if (equal? pp 'g1) (label 71) (label 70)))
+  ((label 71)
+   (:= vs (update vs 'bb (reduce '(lookup program (caddr command)) vs)))
+   (if (reduce '(null? bb) vs) (label 175) (label 170)))
+  ((label 70) (if (equal? pp 'g2) (label 69) (label 68)))
+  ((label 69)
+   (:= vs (update vs 'bb (reduce '(lookup program (cadddr command)) vs)))
+   (if (reduce '(null? bb) vs) (label 136) (label 131)))
+  ((label 68) (if (equal? pp 'exit) (label 67) (label 66)))
+  ((label 67)
+   (:=
+    code-block
+    (extend (generate-return '(reverse residual-code) vs) code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 108) (label 107)))
+  ((label 66) (if (equal? pp 'loop) (label 65) (label 64)))
+  ((label 65)
+   (:= code-block (extend (generate-assign 'pp '(caar pending) vs) code-block))
+   (:= code-block (extend (generate-assign 'vs '(cdar pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'pending '(cdr pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'label '(pair pp vs) vs) code-block))
+   (:=
+    pending
+    (unite (list (pair 'check-pending vs) (pair 'loop-mark vs)) pending))
+   (:=
+    code-block
+    (extend
+     (generate-if '(elem? label marked) vs 'check-pending 'loop-mark)
+     code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 87) (label 86)))
+  ((label 64) (return (error "Some stupid error")))
+  ((label 63)
+   (:=
+    code-block
+    (extend
+     (generate-assign
+      'pending
+      '(unite
+        (list (pair (caddr command) vs) (pair (cadddr command) vs))
+        pending)
+      vs)
+     code-block))
+   (:=
+    code-block
+    (extend
+     (generate-assign
+      'code-block
+      '(extend
+        (generate-if (cadr command) vs (caddr command) (cadddr command))
+        code-block)
+      vs)
+     code-block))
+   (if (reduce '(null? bb) vs) (label 222) (label 217)))
+  ((label 62)
+   (:=
+    code-block
+    (extend
+     (generate-return '(error "Wrong command to match: " command) vs)
+     code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 61) (label 60)))
+  ((label 61) (return (reverse residual-code)))
+  ((label 60)
+   (:= pp (caar pending))
+   (:= vs (cdar pending))
+   (:= pending (cdr pending))
+   (:= label (pair pp vs))
+   (if (elem? label marked) (label 59) (label 58)))
+  ((label 59) (if (null? pending) (label 61) (label 60)))
+  ((label 58)
+   (:= marked (cons (pair pp vs) marked))
+   (:= code-block '())
+   (if (equal? pp 'init) (label 149) (label 148)))
+  ((label 57)
+   (:=
+    code-block
+    (extend
+     (generate-assign
+      'code-block
+      '(extend (generate-assign (cadr command) (caddr command) vs) code-block)
+      vs)
+     code-block))
+   (if (reduce '(null? bb) vs) (label 222) (label 217)))
+  ((label 56) (if (equal? pp 'lookup-pp-2) (label 55) (label 54)))
+  ((label 55)
+   (:= vs (update vs 'lookup-program (reduce '(cdr lookup-program) vs)))
+   (if (reduce '(null? lookup-program) vs) (label 196) (label 182)))
+  ((label 54) (if (equal? pp 'g1) (label 53) (label 52)))
+  ((label 53)
+   (:= vs (update vs 'bb (reduce '(lookup program (caddr command)) vs)))
+   (if (reduce '(null? bb) vs) (label 175) (label 170)))
+  ((label 52) (if (equal? pp 'g2) (label 51) (label 50)))
+  ((label 51)
+   (:= vs (update vs 'bb (reduce '(lookup program (cadddr command)) vs)))
+   (if (reduce '(null? bb) vs) (label 136) (label 131)))
+  ((label 50) (if (equal? pp 'exit) (label 49) (label 48)))
+  ((label 49)
+   (:=
+    code-block
+    (extend (generate-return '(reverse residual-code) vs) code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 108) (label 107)))
+  ((label 48) (if (equal? pp 'loop) (label 47) (label 46)))
+  ((label 47)
+   (:= code-block (extend (generate-assign 'pp '(caar pending) vs) code-block))
+   (:= code-block (extend (generate-assign 'vs '(cdar pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'pending '(cdr pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'label '(pair pp vs) vs) code-block))
+   (:=
+    pending
+    (unite (list (pair 'check-pending vs) (pair 'loop-mark vs)) pending))
+   (:=
+    code-block
+    (extend
+     (generate-if '(elem? label marked) vs 'check-pending 'loop-mark)
+     code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 87) (label 86)))
+  ((label 46) (return (error "Some stupid error")))
+  ((label 45) (if (equal? pp 'loop-inner) (label 44) (label 43)))
+  ((label 44)
+   (:= vs (update vs 'command (reduce '(car bb) vs)))
+   (:= vs (update vs 'bb (reduce '(cdr bb) vs)))
+   (if (reduce '(equal? ':= (car command)) vs) (label 224) (label 216)))
+  ((label 43) (if (equal? pp 'lookup-pp-2) (label 42) (label 41)))
+  ((label 42)
+   (:= vs (update vs 'lookup-program (reduce '(cdr lookup-program) vs)))
+   (if (reduce '(null? lookup-program) vs) (label 196) (label 182)))
+  ((label 41) (if (equal? pp 'g1) (label 40) (label 39)))
+  ((label 40)
+   (:= vs (update vs 'bb (reduce '(lookup program (caddr command)) vs)))
+   (if (reduce '(null? bb) vs) (label 175) (label 170)))
+  ((label 39) (if (equal? pp 'g2) (label 38) (label 37)))
+  ((label 38)
+   (:= vs (update vs 'bb (reduce '(lookup program (cadddr command)) vs)))
+   (if (reduce '(null? bb) vs) (label 136) (label 131)))
+  ((label 37) (if (equal? pp 'exit) (label 36) (label 35)))
+  ((label 36)
+   (:=
+    code-block
+    (extend (generate-return '(reverse residual-code) vs) code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 108) (label 107)))
+  ((label 35) (if (equal? pp 'loop) (label 34) (label 33)))
+  ((label 34)
+   (:= code-block (extend (generate-assign 'pp '(caar pending) vs) code-block))
+   (:= code-block (extend (generate-assign 'vs '(cdar pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'pending '(cdr pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'label '(pair pp vs) vs) code-block))
+   (:=
+    pending
+    (unite (list (pair 'check-pending vs) (pair 'loop-mark vs)) pending))
+   (:=
+    code-block
+    (extend
+     (generate-if '(elem? label marked) vs 'check-pending 'loop-mark)
+     code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 87) (label 86)))
+  ((label 33) (return (error "Some stupid error")))
+  ((label 32) (if (equal? pp 'loop-mark) (label 31) (label 30)))
+  ((label 31)
+   (:=
+    code-block
+    (extend
+     (generate-assign 'marked '(cons (pair pp vs) marked) vs)
+     code-block))
+   (:= code-block (extend (generate-assign 'code-block ''() vs) code-block))
+   (:= vs (update vs 'lookup-program (reduce 'block-in-pending vs)))
+   (:= vs (update vs 'pp-cur (reduce '(caar lookup-program) vs)))
+   (:= vs (update vs 'bb (reduce '(cdar lookup-program) vs)))
+   (:=
+    pending
+    (unite (list (pair 'loop-inner vs) (pair 'lookup-pp-2 vs)) pending))
+   (:=
+    code-block
+    (extend
+     (generate-if '(equal? pp pp-cur) vs 'loop-inner 'lookup-pp-2)
+     code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 235) (label 234)))
+  ((label 30) (if (equal? pp 'loop-inner) (label 29) (label 28)))
+  ((label 29)
+   (:= vs (update vs 'command (reduce '(car bb) vs)))
+   (:= vs (update vs 'bb (reduce '(cdr bb) vs)))
+   (if (reduce '(equal? ':= (car command)) vs) (label 224) (label 216)))
+  ((label 28) (if (equal? pp 'lookup-pp-2) (label 27) (label 26)))
+  ((label 27)
+   (:= vs (update vs 'lookup-program (reduce '(cdr lookup-program) vs)))
+   (if (reduce '(null? lookup-program) vs) (label 196) (label 182)))
+  ((label 26) (if (equal? pp 'g1) (label 25) (label 24)))
+  ((label 25)
+   (:= vs (update vs 'bb (reduce '(lookup program (caddr command)) vs)))
+   (if (reduce '(null? bb) vs) (label 175) (label 170)))
+  ((label 24) (if (equal? pp 'g2) (label 23) (label 22)))
+  ((label 23)
+   (:= vs (update vs 'bb (reduce '(lookup program (cadddr command)) vs)))
+   (if (reduce '(null? bb) vs) (label 136) (label 131)))
+  ((label 22) (if (equal? pp 'exit) (label 21) (label 20)))
+  ((label 21)
+   (:=
+    code-block
+    (extend (generate-return '(reverse residual-code) vs) code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 108) (label 107)))
+  ((label 20) (if (equal? pp 'loop) (label 19) (label 18)))
+  ((label 19)
+   (:= code-block (extend (generate-assign 'pp '(caar pending) vs) code-block))
+   (:= code-block (extend (generate-assign 'vs '(cdar pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'pending '(cdr pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'label '(pair pp vs) vs) code-block))
+   (:=
+    pending
+    (unite (list (pair 'check-pending vs) (pair 'loop-mark vs)) pending))
+   (:=
+    code-block
+    (extend
+     (generate-if '(elem? label marked) vs 'check-pending 'loop-mark)
+     code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 87) (label 86)))
+  ((label 18) (return (error "Some stupid error")))
+  ((label 17) (if (equal? pp 'check-pending) (label 16) (label 15)))
+  ((label 16)
+   (:= pending (unite (list (pair 'exit vs) (pair 'loop vs)) pending))
+   (:=
+    code-block
+    (extend (generate-if '(null? pending) vs 'exit 'loop) code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 244) (label 243)))
+  ((label 15) (if (equal? pp 'loop-mark) (label 14) (label 13)))
+  ((label 14)
+   (:=
+    code-block
+    (extend
+     (generate-assign 'marked '(cons (pair pp vs) marked) vs)
+     code-block))
+   (:= code-block (extend (generate-assign 'code-block ''() vs) code-block))
+   (:= vs (update vs 'lookup-program (reduce 'block-in-pending vs)))
+   (:= vs (update vs 'pp-cur (reduce '(caar lookup-program) vs)))
+   (:= vs (update vs 'bb (reduce '(cdar lookup-program) vs)))
+   (:=
+    pending
+    (unite (list (pair 'loop-inner vs) (pair 'lookup-pp-2 vs)) pending))
+   (:=
+    code-block
+    (extend
+     (generate-if '(equal? pp pp-cur) vs 'loop-inner 'lookup-pp-2)
+     code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 235) (label 234)))
+  ((label 13) (if (equal? pp 'loop-inner) (label 12) (label 11)))
+  ((label 12)
+   (:= vs (update vs 'command (reduce '(car bb) vs)))
+   (:= vs (update vs 'bb (reduce '(cdr bb) vs)))
+   (if (reduce '(equal? ':= (car command)) vs) (label 224) (label 216)))
+  ((label 11) (if (equal? pp 'lookup-pp-2) (label 10) (label 9)))
+  ((label 10)
+   (:= vs (update vs 'lookup-program (reduce '(cdr lookup-program) vs)))
+   (if (reduce '(null? lookup-program) vs) (label 196) (label 182)))
+  ((label 9) (if (equal? pp 'g1) (label 8) (label 7)))
+  ((label 8)
+   (:= vs (update vs 'bb (reduce '(lookup program (caddr command)) vs)))
+   (if (reduce '(null? bb) vs) (label 175) (label 170)))
+  ((label 7) (if (equal? pp 'g2) (label 6) (label 5)))
+  ((label 6)
+   (:= vs (update vs 'bb (reduce '(lookup program (cadddr command)) vs)))
+   (if (reduce '(null? bb) vs) (label 136) (label 131)))
+  ((label 5) (if (equal? pp 'exit) (label 4) (label 3)))
+  ((label 4)
+   (:=
+    code-block
+    (extend (generate-return '(reverse residual-code) vs) code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 108) (label 107)))
+  ((label 3) (if (equal? pp 'loop) (label 2) (label 1)))
+  ((label 2)
+   (:= code-block (extend (generate-assign 'pp '(caar pending) vs) code-block))
+   (:= code-block (extend (generate-assign 'vs '(cdar pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'pending '(cdr pending) vs) code-block))
+   (:=
+    code-block
+    (extend (generate-assign 'label '(pair pp vs) vs) code-block))
+   (:=
+    pending
+    (unite (list (pair 'check-pending vs) (pair 'loop-mark vs)) pending))
+   (:=
+    code-block
+    (extend
+     (generate-if '(elem? label marked) vs 'check-pending 'loop-mark)
+     code-block))
+   (:= residual-code (cons (cons label (reverse code-block)) residual-code))
+   (if (null? pending) (label 87) (label 86)))
+  ((label 1) (return (error "Some stupid error")))))

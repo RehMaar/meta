@@ -139,17 +139,15 @@
      (:= Left (cdr Left))
      (goto loop))
    (do-write
-     (:= Symbol (caddr Instruction))
-     (:= Right (cons Symbol (cdr Right)))
+     (:= Right (cons (caddr Instruction) (cdr Right)))
      (goto loop))
    (do-goto
      (:= NextLabel (caddr Instruction))
      (:= Qtail (list-tail Q NextLabel))
      (goto loop))
    (do-if
-     (:= Symbol (third Instruction))
      (:= NextLabel (fifth Instruction))
-     (if (equal? Symbol (car Right)) jump loop))
+     (if (equal? (third Instruction) (car Right)) jump loop))
    (jump
     (:= Qtail (list-tail Q NextLabel))
     (goto loop))
@@ -160,8 +158,7 @@
 )
 
 (define (tape-head xs)
-  (if (null? xs) '() (car xs))
-)
+  (if (null? xs) '() (car xs)))
 
 (define (tape-tail xs)
   (if (null? xs) '(()) (cdr xs))
